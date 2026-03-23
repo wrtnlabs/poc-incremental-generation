@@ -1,0 +1,28 @@
+{
+  "name": "incremental-parser",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.12.1",
+  "scripts": {
+    "prepare": "ts-patch install",
+    "build": "tsc -p tsconfig.json",
+    "test": "rm -rf .test-dist && tsc -p tsconfig.test.json --outDir .test-dist && jest --runInBand --config jest.dist.cjs",
+    "runner": "pnpm build && node dist/runner/index.js",
+    "runner:micro": "pnpm build && node dist/runner/micro.js"
+  },
+  "dependencies": {
+    "@agentica/core": "0.44.1",
+    "@samchon/openapi": "6.0.1",
+    "@typia/interface": "12.0.1",
+    "dotenv": "17.3.1",
+    "openai": "6.32.0",
+    "typia": "12.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "30.0.0",
+    "@types/node": "25.5.0",
+    "jest": "30.3.0",
+    "ts-patch": "3.3.0",
+    "typescript": "5.9.3"
+  }
+}
