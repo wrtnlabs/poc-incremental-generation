@@ -1,64 +1,114 @@
-import type { OrderPatch } from "../../src/domain/patch";
-import { runRequestedOrderDraftLoop } from "../../src/runtime/runRequestedOrderDraftLoop";
+import type { AstPatch } from "../../src/domain/patch";
+import { runRequestedAstCompletionLoop } from "../../src/runtime/runRequestedAstCompletionLoop";
 
-describe("runRequestedOrderDraftLoop", () => {
+describe("runRequestedAstCompletionLoop", () => {
   it("converges with an injected patch requester", async () => {
-    const patches: OrderPatch[] = [
+    const patches: AstPatch[] = [
       {
-        customer: {
-          name: "Alice",
-        },
+        moduleName: "MathOps",
       },
       {
-        customer: {
-          email: "alice@example.com",
-        },
-        shipping: {
-          address1: "123 Main St",
-          city: "Seoul",
-          postalCode: "04524",
-        },
-      },
-      {
-        items: [
+        functions: [
           {
-            sku: "SKU-001",
-            quantity: 2,
+            name: "add",
+            parameters: [
+              {
+                name: "left",
+                type: {
+                  kind: "builtin",
+                  name: "Int",
+                },
+              },
+              {
+                name: "right",
+                type: {
+                  kind: "builtin",
+                  name: "Int",
+                },
+              },
+            ],
+            returnType: {
+              kind: "builtin",
+              name: "Int",
+            },
           },
         ],
-        note: null,
+      },
+      {
+        functions: [
+          {
+            name: "add",
+            parameters: [
+              {
+                name: "left",
+                type: {
+                  kind: "builtin",
+                  name: "Int",
+                },
+              },
+              {
+                name: "right",
+                type: {
+                  kind: "builtin",
+                  name: "Int",
+                },
+              },
+            ],
+            returnType: {
+              kind: "builtin",
+              name: "Int",
+            },
+            body: {
+              statements: [
+                {
+                  kind: "return",
+                  expression: {
+                    kind: "binary",
+                    operator: "+",
+                    left: {
+                      kind: "identifier",
+                      name: "left",
+                    },
+                    right: {
+                      kind: "identifier",
+                      name: "right",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        ],
+        exports: ["add"],
+        docComment: null,
       },
     ];
 
-    const result = await runRequestedOrderDraftLoop({
-      objective: "create the order draft",
+    const result = await runRequestedAstCompletionLoop({
+      objective: "create the AST",
       maxAttempts: patches.length,
       requestPatch: async ({ attempt }) => patches[attempt - 1] ?? {},
     });
 
     expect(result.terminal).toBe("success");
     if (result.terminal === "success") {
-      expect(result.value.customer.email).toBe("alice@example.com");
+      expect(result.value.functions[0].name).toBe("add");
     }
   });
 
   it("exhausts retries when patches stay incomplete", async () => {
-    const result = await runRequestedOrderDraftLoop({
-      objective: "create the order draft",
+    const result = await runRequestedAstCompletionLoop({
+      objective: "create the AST",
       maxAttempts: 2,
       requestPatch: async ({ attempt }) => ({
-        customer: {
-          name: `Alice ${attempt}`,
-        },
+        moduleName: `MathOps${attempt}`,
       }),
     });
 
     expect(result.terminal).toBe("retry_exhausted");
     if (result.terminal === "retry_exhausted") {
       expect(result.candidate).toEqual({
-        customer: {
-          name: "Alice 2",
-        },
+        moduleName: "MathOps2",
       });
     }
   });
