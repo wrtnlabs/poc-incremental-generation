@@ -1,20 +1,20 @@
-import { mergeOrderPatch } from "../accumulation/mergeOrderPatch";
+import { mergeAstPatch } from "../accumulation/mergeAstPatch";
 import {
-  analyzeOrderCompletion,
+  analyzeAstCompletion,
   type CompletionAnalysis,
-} from "../completeness/analyzeOrderCompletion";
-import type { OrderDraft } from "../domain/order";
-import type { OrderPatch } from "../domain/patch";
+} from "../completeness/analyzeAstCompletion";
+import type { ImaginaryModuleAst } from "../domain/ast";
+import type { AstPatch } from "../domain/patch";
 import {
   normalizeCompletionFeedback,
   type RetryFeedback,
 } from "../feedback/normalizeCompletionFeedback";
-import { parseOrderPatch, type IngressResult } from "../ingress/parseOrderPatch";
+import { parseAstPatch, type IngressResult } from "../ingress/parseAstPatch";
 
 export interface LoopAttempt {
   raw: string;
   ingress: IngressResult;
-  candidate: OrderPatch;
+  candidate: AstPatch;
   analysis: CompletionAnalysis | null;
   feedback: RetryFeedback | string;
 }
@@ -22,26 +22,26 @@ export interface LoopAttempt {
 export type LoopResult =
   | {
       terminal: "success";
-      value: OrderDraft;
+      value: ImaginaryModuleAst;
       attempts: LoopAttempt[];
     }
   | {
       terminal: "retry_exhausted";
-      candidate: OrderPatch;
+      candidate: AstPatch;
       attempts: LoopAttempt[];
     };
 
 const describeIngressFailure = (result: Exclude<IngressResult, { success: true }>): string =>
   result.kind === "parse_error"
-    ? `Unable to parse the latest patch: ${result.errors.join("; ")}`
-    : `The latest patch shape is invalid for DeepPartial<OrderDraft>: ${result.errors.map((error) => `${error.path} -> ${error.expected}`).join("; ")}`;
+    ? `Unable to parse the latest AST patch: ${result.errors.join("; ")}`
+    : `The latest patch shape is invalid for DeepPartial<ImaginaryModuleAst>: ${result.errors.map((error) => `${error.path} -> ${error.expected}`).join("; ")}`;
 
-export const runOrderDraftLoop = (
+export const runAstCompletionLoop = (
   inputs: readonly string[],
   maxAttempts: number = inputs.length,
 ): LoopResult => {
   const finalState = inputs.slice(0, maxAttempts).reduce<{
-    candidate: OrderPatch;
+    candidate: AstPatch;
     attempts: LoopAttempt[];
     result: LoopResult | null;
   }>(
@@ -50,7 +50,7 @@ export const runOrderDraftLoop = (
         return state;
       }
 
-      const ingress: IngressResult = parseOrderPatch(raw);
+      const ingress: IngressResult = parseAstPatch(raw);
       if (ingress.success === false) {
         return {
           ...state,
@@ -67,8 +67,8 @@ export const runOrderDraftLoop = (
         };
       }
 
-      const candidate: OrderPatch = mergeOrderPatch(state.candidate, ingress.draft);
-      const analysis: CompletionAnalysis = analyzeOrderCompletion(candidate);
+      const candidate: AstPatch = mergeAstPatch(state.candidate, ingress.ast);
+      const analysis: CompletionAnalysis = analyzeAstCompletion(candidate);
       const feedback: RetryFeedback = normalizeCompletionFeedback(analysis);
       const attempts: LoopAttempt[] = [
         ...state.attempts,
@@ -87,7 +87,7 @@ export const runOrderDraftLoop = (
             attempts,
             result: {
               terminal: "success",
-              value: candidate as OrderDraft,
+              value: candidate as ImaginaryModuleAst,
               attempts,
             },
           }
