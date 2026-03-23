@@ -1,4 +1,4 @@
-import type { OrderPatch } from "../domain/patch";
+import type { AstPatch } from "../domain/patch";
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && Array.isArray(value) === false;
@@ -26,7 +26,7 @@ const mergeUnknown = (base: unknown, patch: unknown): unknown => {
   return patch;
 };
 
-export const mergeOrderPatch = (
-  current: OrderPatch,
-  incoming: OrderPatch,
-): OrderPatch => mergeUnknown(current, incoming) as OrderPatch;
+export const mergeAstPatch = (
+  current: AstPatch,
+  incoming: AstPatch,
+): AstPatch => mergeUnknown(current, incoming) as AstPatch;

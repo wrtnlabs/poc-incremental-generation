@@ -1,68 +1,47 @@
-import { mergeOrderPatch } from "../../src/accumulation/mergeOrderPatch";
+import { mergeAstPatch } from "../../src/accumulation/mergeAstPatch";
 
-describe("mergeOrderPatch", () => {
+describe("mergeAstPatch", () => {
   it("deep merges objects while overwriting scalars", () => {
-    const merged = mergeOrderPatch(
+    const merged = mergeAstPatch(
       {
-        customer: {
-          name: "Alice",
-        },
+        moduleName: "MathOps",
       },
       {
-        customer: {
-          email: "alice@example.com",
-        },
+        docComment: null,
       },
     );
     expect(merged).toEqual({
-      customer: {
-        name: "Alice",
-        email: "alice@example.com",
-      },
+      moduleName: "MathOps",
+      docComment: null,
     });
   });
 
   it("replaces arrays as a whole", () => {
-    const merged = mergeOrderPatch(
+    const merged = mergeAstPatch(
       {
-        items: [
-          {
-            sku: "OLD",
-            quantity: 1,
-          },
-        ],
+        exports: ["oldValue"],
       },
       {
-        items: [
-          {
-            sku: "NEW",
-            quantity: 2,
-          },
-        ],
+        exports: ["add"],
       },
     );
     expect(merged).toEqual({
-      items: [
-        {
-          sku: "NEW",
-          quantity: 2,
-        },
-      ],
+      exports: ["add"],
     });
   });
 
   it("ignores undefined and preserves null", () => {
-    const merged = mergeOrderPatch(
+    const merged = mergeAstPatch(
       {
-        note: "keep me",
+        docComment: "keep me",
       },
       {
-        note: null,
-        shipping: undefined,
+        docComment: null,
+        functions: undefined,
       },
     );
     expect(merged).toEqual({
-      note: null,
+      docComment: null,
     });
   });
 });
