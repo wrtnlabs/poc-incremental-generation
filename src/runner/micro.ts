@@ -1,23 +1,24 @@
 import "dotenv/config";
 
+import { formatTerminalCompletionLog } from "./formatTerminalCompletionLog";
 import { createMicroAgenticaPatchRequester } from "../runtime/createMicroAgenticaPatchRequester";
 import { readMicroAgenticaRuntimeConfig } from "../runtime/readMicroAgenticaRuntimeConfig";
-import { runRequestedOrderDraftLoop } from "../runtime/runRequestedOrderDraftLoop";
+import { runRequestedAstCompletionLoop } from "../runtime/runRequestedAstCompletionLoop";
 
-const OBJECTIVE = `Create an order draft for Alice.
+const OBJECTIVE = `Create an AST for a fictional language module named MathOps.
 
-- customer.name: Alice
-- customer.email: alice@example.com
-- shipping.address1: 123 Main St
-- shipping.city: Seoul
-- shipping.postalCode: 04524
-- items: [{ sku: "SKU-001", quantity: 2 }]
-- note: null
+- exports: ["add"]
+- docComment: null
+- one function named add
+- parameters: left: Int, right: Int
+- returnType: Int
+- function body: return left + right
+- generate AST nodes only, never source code text as the final artifact
 `;
 
 const main = async (): Promise<void> => {
   const config = readMicroAgenticaRuntimeConfig(process.env);
-  const result = await runRequestedOrderDraftLoop({
+  const result = await runRequestedAstCompletionLoop({
     objective: OBJECTIVE,
     maxAttempts: Number.parseInt(process.env.MAX_ATTEMPTS ?? "5", 10),
     requestPatch: createMicroAgenticaPatchRequester(config),
@@ -35,11 +36,13 @@ const main = async (): Promise<void> => {
 
   if (result.terminal === "success") {
     console.log("Terminal: success");
+    console.log(formatTerminalCompletionLog(result));
     console.log(JSON.stringify(result.value, null, 2));
     return;
   }
 
   console.log("Terminal: retry_exhausted");
+  console.log(formatTerminalCompletionLog(result));
   console.log(JSON.stringify(result.candidate, null, 2));
 };
 
