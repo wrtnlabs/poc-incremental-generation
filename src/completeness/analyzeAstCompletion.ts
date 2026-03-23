@@ -1,6 +1,6 @@
 import typia, { ILlmSchema } from "typia";
 
-import type { OrderDraft } from "../domain/order";
+import type { ImaginaryModuleAst } from "../domain/ast";
 
 export interface MissingCompletionIssue {
   kind: "missing";
@@ -39,7 +39,7 @@ interface TraversalResult {
   hasMissingDescendant: boolean;
 }
 
-const ORDER_SCHEMA: ILlmSchema.IParameters = typia.llm.parameters<OrderDraft>();
+const AST_SCHEMA: ILlmSchema.IParameters = typia.llm.parameters<ImaginaryModuleAst>();
 
 const toPath = (path: string): string =>
   path.startsWith("$input.")
@@ -141,7 +141,7 @@ const dedupeByPath = <T extends { path: string }>(items: readonly T[]): T[] =>
       array.findIndex((candidate) => candidate.path === item.path) === index,
   );
 
-export const analyzeOrderCompletion = (
+export const analyzeAstCompletion = (
   candidate: unknown,
 ): CompletionAnalysis => {
   const walkNode = (
@@ -149,7 +149,7 @@ export const analyzeOrderCompletion = (
     value: unknown,
     path: string,
   ): TraversalResult => {
-    const selected: ILlmSchema = selectSchema(schema, ORDER_SCHEMA.$defs, value);
+    const selected: ILlmSchema = selectSchema(schema, AST_SCHEMA.$defs, value);
     if (isObjectSchema(selected)) {
       if (isRecord(value) === false) {
         return {
@@ -221,16 +221,17 @@ export const analyzeOrderCompletion = (
     };
   };
 
-  const traversal: TraversalResult = walkNode(ORDER_SCHEMA, candidate, "");
-  const validation = typia.validate<OrderDraft>(candidate);
+  const traversal: TraversalResult = walkNode(AST_SCHEMA, candidate, "");
+  const validation = typia.validate<ImaginaryModuleAst>(candidate);
 
   const invalid: InvalidCompletionIssue[] = sortByPath(
     dedupeByPath(
       (validation.success === false
-        ? validation.errors.filter(
-            (error): error is typeof error & { value: unknown } =>
-              error.value !== undefined,
-          )
+        ? validation.errors
+            .filter(
+              (error): error is typeof error & { value: unknown } =>
+                error.value !== undefined,
+            )
             .map((error) => ({
               kind: "invalid" as const,
               path: toPath(error.path),
