@@ -1,7 +1,7 @@
 import type {
   CompletionAnalysis,
   InvalidCompletionIssue,
-} from "../completeness/analyzeOrderCompletion";
+} from "../completeness/analyzeAstCompletion";
 
 export interface RetryFeedback {
   summary: string;
@@ -19,7 +19,7 @@ export const normalizeCompletionFeedback = (
 ): RetryFeedback => {
   if (analysis.complete) {
     return {
-      summary: "The order draft is complete.",
+      summary: "The AST is complete.",
       missing: [],
       incomplete: [],
       invalid: [],
@@ -36,8 +36,8 @@ export const normalizeCompletionFeedback = (
 
   const summary: string =
     missing.length > 0 || incomplete.length > 0
-      ? "The order draft is not complete yet. Add the missing branches first, then fill the remaining missing fields."
-      : "The order draft structure is complete, but one or more fields still need correction.";
+      ? "The AST is not complete yet. Add the missing branches first, then fill the remaining missing nodes."
+      : "The AST structure is complete, but one or more nodes still need correction.";
 
   return {
     summary,
