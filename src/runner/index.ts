@@ -1,13 +1,14 @@
-import { runOrderDraftLoop } from "../loop/runOrderDraftLoop";
+import { formatTerminalCompletionLog } from "./formatTerminalCompletionLog";
+import { runAstCompletionLoop } from "../loop/runAstCompletionLoop";
 
 const sequence: string[] = [
-  '{"draft":{"customer":{"name":"Alice"}}}',
-  '{"draft":{"customer":{"email":"alice@example.com"},"shipping":{"address1":"123 Main St","city":"Seoul","postalCode":"04524"}}}',
-  '{"draft":{"items":[{"sku":"SKU-001","quantity":"2"}],"note":null}}',
-  '{"draft":{"items":[{"sku":"SKU-001","quantity":2}]}}',
+  '{"ast":{"moduleName":"MathOps"}}',
+  '{"ast":{"functions":[{"name":"add","parameters":[{"name":"left","type":{"kind":"builtin","name":"Int"}},{"name":"right","type":{"kind":"builtin","name":"Int"}}],"returnType":{"kind":"builtin","name":"Int"}}]}}',
+  '{"ast":{"functions":[{"name":"add","parameters":[{"name":"left","type":{"kind":"builtin","name":"Int"}},{"name":"right","type":{"kind":"builtin","name":"Int"}}],"returnType":{"kind":"builtin","name":"Int"},"body":{"statements":[{"kind":"return","expression":{"kind":"binary","operator":"plus","left":{"kind":"identifier","name":"left"},"right":{"kind":"identifier","name":"right"}}}]}}],"exports":["add"],"docComment":null}}',
+  '{"ast":{"functions":[{"name":"add","parameters":[{"name":"left","type":{"kind":"builtin","name":"Int"}},{"name":"right","type":{"kind":"builtin","name":"Int"}}],"returnType":{"kind":"builtin","name":"Int"},"body":{"statements":[{"kind":"return","expression":{"kind":"binary","operator":"+","left":{"kind":"identifier","name":"left"},"right":{"kind":"identifier","name":"right"}}}]}}],"exports":["add"],"docComment":null}}',
 ];
 
-const result = runOrderDraftLoop(sequence);
+const result = runAstCompletionLoop(sequence);
 
 result.attempts.forEach((attempt, index) => {
   console.log(`Attempt ${index + 1}`);
@@ -21,8 +22,10 @@ result.attempts.forEach((attempt, index) => {
 
 if (result.terminal === "success") {
   console.log("Terminal: success");
+  console.log(formatTerminalCompletionLog(result));
   console.log(JSON.stringify(result.value, null, 2));
 } else {
   console.log("Terminal: retry_exhausted");
+  console.log(formatTerminalCompletionLog(result));
   console.log(JSON.stringify(result.candidate, null, 2));
 }
