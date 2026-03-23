@@ -36,90 +36,173 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const __typia_transform__isFormatEmail = __importStar(require("typia/lib/internal/_isFormatEmail"));
 const __typia_transform__validateReport = __importStar(require("typia/lib/internal/_validateReport"));
 const typia_1 = __importDefault(require("typia"));
-describe("OrderDraft schema fixtures", () => {
+describe("ImaginaryModuleAst schema fixtures", () => {
     it("accepts a fully complete object", () => {
-        const result = (() => { const _io0 = input => "object" === typeof input.customer && null !== input.customer && _io1(input.customer) && ("object" === typeof input.shipping && null !== input.shipping && _io2(input.shipping)) && (Array.isArray(input.items) && input.items.every(elem => "object" === typeof elem && null !== elem && _io3(elem))) && (null === input.note || "string" === typeof input.note); const _io1 = input => "string" === typeof input.name && ("string" === typeof input.email && __typia_transform__isFormatEmail._isFormatEmail(input.email)); const _io2 = input => "string" === typeof input.address1 && "string" === typeof input.city && "string" === typeof input.postalCode; const _io3 = input => "string" === typeof input.sku && "number" === typeof input.quantity; const _vo0 = (input, _path, _exceptionable = true) => [("object" === typeof input.customer && null !== input.customer || _report(_exceptionable, {
-                path: _path + ".customer",
-                expected: "__type",
-                value: input.customer
-            })) && _vo1(input.customer, _path + ".customer", true && _exceptionable) || _report(_exceptionable, {
-                path: _path + ".customer",
-                expected: "__type",
-                value: input.customer
-            }), ("object" === typeof input.shipping && null !== input.shipping || _report(_exceptionable, {
-                path: _path + ".shipping",
-                expected: "__type.o3",
-                value: input.shipping
-            })) && _vo2(input.shipping, _path + ".shipping", true && _exceptionable) || _report(_exceptionable, {
-                path: _path + ".shipping",
-                expected: "__type.o3",
-                value: input.shipping
-            }), (Array.isArray(input.items) || _report(_exceptionable, {
-                path: _path + ".items",
-                expected: "Array<OrderItem>",
-                value: input.items
-            })) && input.items.map((elem, _index2) => ("object" === typeof elem && null !== elem || _report(_exceptionable, {
-                path: _path + ".items[" + _index2 + "]",
-                expected: "OrderItem",
+        const result = (() => { const _io0 = input => "string" === typeof input.moduleName && (Array.isArray(input.functions) && input.functions.every(elem => "object" === typeof elem && null !== elem && _io1(elem))) && (Array.isArray(input.exports) && input.exports.every(elem => "string" === typeof elem)) && (null === input.docComment || "string" === typeof input.docComment); const _io1 = input => "string" === typeof input.name && (Array.isArray(input.parameters) && input.parameters.every(elem => "object" === typeof elem && null !== elem && _io2(elem))) && ("object" === typeof input.returnType && null !== input.returnType && _io3(input.returnType)) && ("object" === typeof input.body && null !== input.body && _io4(input.body)); const _io2 = input => "string" === typeof input.name && ("object" === typeof input.type && null !== input.type && _io3(input.type)); const _io3 = input => ("builtin" === input.kind || "named" === input.kind) && "string" === typeof input.name; const _io4 = input => Array.isArray(input.statements) && input.statements.every(elem => "object" === typeof elem && null !== elem && _io5(elem)); const _io5 = input => "return" === input.kind && ("object" === typeof input.expression && null !== input.expression && _io6(input.expression)); const _io6 = input => "binary" === input.kind && ("+" === input.operator || "-" === input.operator || "*" === input.operator || "/" === input.operator) && ("object" === typeof input.left && null !== input.left && _io7(input.left)) && ("object" === typeof input.right && null !== input.right && _io7(input.right)); const _io7 = input => "identifier" === input.kind && "string" === typeof input.name; const _vo0 = (input, _path, _exceptionable = true) => ["string" === typeof input.moduleName || _report(_exceptionable, {
+                path: _path + ".moduleName",
+                expected: "string",
+                value: input.moduleName
+            }), (Array.isArray(input.functions) || _report(_exceptionable, {
+                path: _path + ".functions",
+                expected: "Array<ImaginaryFunctionAst>",
+                value: input.functions
+            })) && input.functions.map((elem, _index5) => ("object" === typeof elem && null !== elem || _report(_exceptionable, {
+                path: _path + ".functions[" + _index5 + "]",
+                expected: "ImaginaryFunctionAst",
                 value: elem
-            })) && _vo3(elem, _path + ".items[" + _index2 + "]", true && _exceptionable) || _report(_exceptionable, {
-                path: _path + ".items[" + _index2 + "]",
-                expected: "OrderItem",
+            })) && _vo1(elem, _path + ".functions[" + _index5 + "]", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".functions[" + _index5 + "]",
+                expected: "ImaginaryFunctionAst",
                 value: elem
             })).every(flag => flag) || _report(_exceptionable, {
-                path: _path + ".items",
-                expected: "Array<OrderItem>",
-                value: input.items
-            }), null === input.note || "string" === typeof input.note || _report(_exceptionable, {
-                path: _path + ".note",
+                path: _path + ".functions",
+                expected: "Array<ImaginaryFunctionAst>",
+                value: input.functions
+            }), (Array.isArray(input.exports) || _report(_exceptionable, {
+                path: _path + ".exports",
+                expected: "Array<string>",
+                value: input.exports
+            })) && input.exports.map((elem, _index6) => "string" === typeof elem || _report(_exceptionable, {
+                path: _path + ".exports[" + _index6 + "]",
+                expected: "string",
+                value: elem
+            })).every(flag => flag) || _report(_exceptionable, {
+                path: _path + ".exports",
+                expected: "Array<string>",
+                value: input.exports
+            }), null === input.docComment || "string" === typeof input.docComment || _report(_exceptionable, {
+                path: _path + ".docComment",
                 expected: "(null | string)",
-                value: input.note
+                value: input.docComment
             })].every(flag => flag); const _vo1 = (input, _path, _exceptionable = true) => ["string" === typeof input.name || _report(_exceptionable, {
                 path: _path + ".name",
                 expected: "string",
                 value: input.name
-            }), "string" === typeof input.email && (__typia_transform__isFormatEmail._isFormatEmail(input.email) || _report(_exceptionable, {
-                path: _path + ".email",
-                expected: "string & Format<\"email\">",
-                value: input.email
-            })) || _report(_exceptionable, {
-                path: _path + ".email",
-                expected: "(string & Format<\"email\">)",
-                value: input.email
-            })].every(flag => flag); const _vo2 = (input, _path, _exceptionable = true) => ["string" === typeof input.address1 || _report(_exceptionable, {
-                path: _path + ".address1",
+            }), (Array.isArray(input.parameters) || _report(_exceptionable, {
+                path: _path + ".parameters",
+                expected: "Array<ImaginaryParameterAst>",
+                value: input.parameters
+            })) && input.parameters.map((elem, _index7) => ("object" === typeof elem && null !== elem || _report(_exceptionable, {
+                path: _path + ".parameters[" + _index7 + "]",
+                expected: "ImaginaryParameterAst",
+                value: elem
+            })) && _vo2(elem, _path + ".parameters[" + _index7 + "]", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".parameters[" + _index7 + "]",
+                expected: "ImaginaryParameterAst",
+                value: elem
+            })).every(flag => flag) || _report(_exceptionable, {
+                path: _path + ".parameters",
+                expected: "Array<ImaginaryParameterAst>",
+                value: input.parameters
+            }), ("object" === typeof input.returnType && null !== input.returnType || _report(_exceptionable, {
+                path: _path + ".returnType",
+                expected: "ImaginaryTypeRefAst",
+                value: input.returnType
+            })) && _vo3(input.returnType, _path + ".returnType", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".returnType",
+                expected: "ImaginaryTypeRefAst",
+                value: input.returnType
+            }), ("object" === typeof input.body && null !== input.body || _report(_exceptionable, {
+                path: _path + ".body",
+                expected: "ImaginaryBlockAst",
+                value: input.body
+            })) && _vo4(input.body, _path + ".body", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".body",
+                expected: "ImaginaryBlockAst",
+                value: input.body
+            })].every(flag => flag); const _vo2 = (input, _path, _exceptionable = true) => ["string" === typeof input.name || _report(_exceptionable, {
+                path: _path + ".name",
                 expected: "string",
-                value: input.address1
-            }), "string" === typeof input.city || _report(_exceptionable, {
-                path: _path + ".city",
+                value: input.name
+            }), ("object" === typeof input.type && null !== input.type || _report(_exceptionable, {
+                path: _path + ".type",
+                expected: "ImaginaryTypeRefAst",
+                value: input.type
+            })) && _vo3(input.type, _path + ".type", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".type",
+                expected: "ImaginaryTypeRefAst",
+                value: input.type
+            })].every(flag => flag); const _vo3 = (input, _path, _exceptionable = true) => ["builtin" === input.kind || "named" === input.kind || _report(_exceptionable, {
+                path: _path + ".kind",
+                expected: "(\"builtin\" | \"named\")",
+                value: input.kind
+            }), "string" === typeof input.name || _report(_exceptionable, {
+                path: _path + ".name",
                 expected: "string",
-                value: input.city
-            }), "string" === typeof input.postalCode || _report(_exceptionable, {
-                path: _path + ".postalCode",
+                value: input.name
+            })].every(flag => flag); const _vo4 = (input, _path, _exceptionable = true) => [(Array.isArray(input.statements) || _report(_exceptionable, {
+                path: _path + ".statements",
+                expected: "Array<ImaginaryReturnStatementAst>",
+                value: input.statements
+            })) && input.statements.map((elem, _index8) => ("object" === typeof elem && null !== elem || _report(_exceptionable, {
+                path: _path + ".statements[" + _index8 + "]",
+                expected: "ImaginaryReturnStatementAst",
+                value: elem
+            })) && _vo5(elem, _path + ".statements[" + _index8 + "]", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".statements[" + _index8 + "]",
+                expected: "ImaginaryReturnStatementAst",
+                value: elem
+            })).every(flag => flag) || _report(_exceptionable, {
+                path: _path + ".statements",
+                expected: "Array<ImaginaryReturnStatementAst>",
+                value: input.statements
+            })].every(flag => flag); const _vo5 = (input, _path, _exceptionable = true) => ["return" === input.kind || _report(_exceptionable, {
+                path: _path + ".kind",
+                expected: "\"return\"",
+                value: input.kind
+            }), ("object" === typeof input.expression && null !== input.expression || _report(_exceptionable, {
+                path: _path + ".expression",
+                expected: "ImaginaryBinaryExpressionAst",
+                value: input.expression
+            })) && _vo6(input.expression, _path + ".expression", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".expression",
+                expected: "ImaginaryBinaryExpressionAst",
+                value: input.expression
+            })].every(flag => flag); const _vo6 = (input, _path, _exceptionable = true) => ["binary" === input.kind || _report(_exceptionable, {
+                path: _path + ".kind",
+                expected: "\"binary\"",
+                value: input.kind
+            }), "+" === input.operator || "-" === input.operator || "*" === input.operator || "/" === input.operator || _report(_exceptionable, {
+                path: _path + ".operator",
+                expected: "(\"*\" | \"+\" | \"-\" | \"/\")",
+                value: input.operator
+            }), ("object" === typeof input.left && null !== input.left || _report(_exceptionable, {
+                path: _path + ".left",
+                expected: "ImaginaryIdentifierAst",
+                value: input.left
+            })) && _vo7(input.left, _path + ".left", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".left",
+                expected: "ImaginaryIdentifierAst",
+                value: input.left
+            }), ("object" === typeof input.right && null !== input.right || _report(_exceptionable, {
+                path: _path + ".right",
+                expected: "ImaginaryIdentifierAst",
+                value: input.right
+            })) && _vo7(input.right, _path + ".right", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".right",
+                expected: "ImaginaryIdentifierAst",
+                value: input.right
+            })].every(flag => flag); const _vo7 = (input, _path, _exceptionable = true) => ["identifier" === input.kind || _report(_exceptionable, {
+                path: _path + ".kind",
+                expected: "\"identifier\"",
+                value: input.kind
+            }), "string" === typeof input.name || _report(_exceptionable, {
+                path: _path + ".name",
                 expected: "string",
-                value: input.postalCode
-            })].every(flag => flag); const _vo3 = (input, _path, _exceptionable = true) => ["string" === typeof input.sku || _report(_exceptionable, {
-                path: _path + ".sku",
-                expected: "string",
-                value: input.sku
-            }), "number" === typeof input.quantity || _report(_exceptionable, {
-                path: _path + ".quantity",
-                expected: "number",
-                value: input.quantity
+                value: input.name
             })].every(flag => flag); const __is = input => "object" === typeof input && null !== input && _io0(input); let errors; let _report; return input => {
             if (false === __is(input)) {
                 errors = [];
                 _report = __typia_transform__validateReport._validateReport(errors);
                 ((input, _path, _exceptionable = true) => ("object" === typeof input && null !== input || _report(true, {
                     path: _path + "",
-                    expected: "OrderDraft",
+                    expected: "ImaginaryModuleAst",
                     value: input
                 })) && _vo0(input, _path + "", true) || _report(true, {
                     path: _path + "",
-                    expected: "OrderDraft",
+                    expected: "ImaginaryModuleAst",
                     value: input
                 }))(input, "$input", true);
                 const success = 0 === errors.length;
@@ -137,105 +220,220 @@ describe("OrderDraft schema fixtures", () => {
                 data: input
             };
         }; })()({
-            customer: {
-                name: "Alice",
-                email: "alice@example.com",
-            },
-            shipping: {
-                address1: "123 Main St",
-                city: "Seoul",
-                postalCode: "04524",
-            },
-            items: [
+            moduleName: "MathOps",
+            functions: [
                 {
-                    sku: "SKU-001",
-                    quantity: 2,
+                    name: "add",
+                    parameters: [
+                        {
+                            name: "left",
+                            type: {
+                                kind: "builtin",
+                                name: "Int",
+                            },
+                        },
+                        {
+                            name: "right",
+                            type: {
+                                kind: "builtin",
+                                name: "Int",
+                            },
+                        },
+                    ],
+                    returnType: {
+                        kind: "builtin",
+                        name: "Int",
+                    },
+                    body: {
+                        statements: [
+                            {
+                                kind: "return",
+                                expression: {
+                                    kind: "binary",
+                                    operator: "+",
+                                    left: {
+                                        kind: "identifier",
+                                        name: "left",
+                                    },
+                                    right: {
+                                        kind: "identifier",
+                                        name: "right",
+                                    },
+                                },
+                            },
+                        ],
+                    },
                 },
             ],
-            note: null,
+            exports: ["add"],
+            docComment: null,
         });
         expect(result.success).toBe(true);
     });
-    it("treats omitted required nullable note as missing", () => {
-        const result = (() => { const _io0 = input => "object" === typeof input.customer && null !== input.customer && _io1(input.customer) && ("object" === typeof input.shipping && null !== input.shipping && _io2(input.shipping)) && (Array.isArray(input.items) && input.items.every(elem => "object" === typeof elem && null !== elem && _io3(elem))) && (null === input.note || "string" === typeof input.note); const _io1 = input => "string" === typeof input.name && ("string" === typeof input.email && __typia_transform__isFormatEmail._isFormatEmail(input.email)); const _io2 = input => "string" === typeof input.address1 && "string" === typeof input.city && "string" === typeof input.postalCode; const _io3 = input => "string" === typeof input.sku && "number" === typeof input.quantity; const _vo0 = (input, _path, _exceptionable = true) => [("object" === typeof input.customer && null !== input.customer || _report(_exceptionable, {
-                path: _path + ".customer",
-                expected: "__type",
-                value: input.customer
-            })) && _vo1(input.customer, _path + ".customer", true && _exceptionable) || _report(_exceptionable, {
-                path: _path + ".customer",
-                expected: "__type",
-                value: input.customer
-            }), ("object" === typeof input.shipping && null !== input.shipping || _report(_exceptionable, {
-                path: _path + ".shipping",
-                expected: "__type.o3",
-                value: input.shipping
-            })) && _vo2(input.shipping, _path + ".shipping", true && _exceptionable) || _report(_exceptionable, {
-                path: _path + ".shipping",
-                expected: "__type.o3",
-                value: input.shipping
-            }), (Array.isArray(input.items) || _report(_exceptionable, {
-                path: _path + ".items",
-                expected: "Array<OrderItem>",
-                value: input.items
-            })) && input.items.map((elem, _index2) => ("object" === typeof elem && null !== elem || _report(_exceptionable, {
-                path: _path + ".items[" + _index2 + "]",
-                expected: "OrderItem",
+    it("treats omitted required nullable docComment as missing", () => {
+        const result = (() => { const _io0 = input => "string" === typeof input.moduleName && (Array.isArray(input.functions) && input.functions.every(elem => "object" === typeof elem && null !== elem && _io1(elem))) && (Array.isArray(input.exports) && input.exports.every(elem => "string" === typeof elem)) && (null === input.docComment || "string" === typeof input.docComment); const _io1 = input => "string" === typeof input.name && (Array.isArray(input.parameters) && input.parameters.every(elem => "object" === typeof elem && null !== elem && _io2(elem))) && ("object" === typeof input.returnType && null !== input.returnType && _io3(input.returnType)) && ("object" === typeof input.body && null !== input.body && _io4(input.body)); const _io2 = input => "string" === typeof input.name && ("object" === typeof input.type && null !== input.type && _io3(input.type)); const _io3 = input => ("builtin" === input.kind || "named" === input.kind) && "string" === typeof input.name; const _io4 = input => Array.isArray(input.statements) && input.statements.every(elem => "object" === typeof elem && null !== elem && _io5(elem)); const _io5 = input => "return" === input.kind && ("object" === typeof input.expression && null !== input.expression && _io6(input.expression)); const _io6 = input => "binary" === input.kind && ("+" === input.operator || "-" === input.operator || "*" === input.operator || "/" === input.operator) && ("object" === typeof input.left && null !== input.left && _io7(input.left)) && ("object" === typeof input.right && null !== input.right && _io7(input.right)); const _io7 = input => "identifier" === input.kind && "string" === typeof input.name; const _vo0 = (input, _path, _exceptionable = true) => ["string" === typeof input.moduleName || _report(_exceptionable, {
+                path: _path + ".moduleName",
+                expected: "string",
+                value: input.moduleName
+            }), (Array.isArray(input.functions) || _report(_exceptionable, {
+                path: _path + ".functions",
+                expected: "Array<ImaginaryFunctionAst>",
+                value: input.functions
+            })) && input.functions.map((elem, _index5) => ("object" === typeof elem && null !== elem || _report(_exceptionable, {
+                path: _path + ".functions[" + _index5 + "]",
+                expected: "ImaginaryFunctionAst",
                 value: elem
-            })) && _vo3(elem, _path + ".items[" + _index2 + "]", true && _exceptionable) || _report(_exceptionable, {
-                path: _path + ".items[" + _index2 + "]",
-                expected: "OrderItem",
+            })) && _vo1(elem, _path + ".functions[" + _index5 + "]", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".functions[" + _index5 + "]",
+                expected: "ImaginaryFunctionAst",
                 value: elem
             })).every(flag => flag) || _report(_exceptionable, {
-                path: _path + ".items",
-                expected: "Array<OrderItem>",
-                value: input.items
-            }), null === input.note || "string" === typeof input.note || _report(_exceptionable, {
-                path: _path + ".note",
+                path: _path + ".functions",
+                expected: "Array<ImaginaryFunctionAst>",
+                value: input.functions
+            }), (Array.isArray(input.exports) || _report(_exceptionable, {
+                path: _path + ".exports",
+                expected: "Array<string>",
+                value: input.exports
+            })) && input.exports.map((elem, _index6) => "string" === typeof elem || _report(_exceptionable, {
+                path: _path + ".exports[" + _index6 + "]",
+                expected: "string",
+                value: elem
+            })).every(flag => flag) || _report(_exceptionable, {
+                path: _path + ".exports",
+                expected: "Array<string>",
+                value: input.exports
+            }), null === input.docComment || "string" === typeof input.docComment || _report(_exceptionable, {
+                path: _path + ".docComment",
                 expected: "(null | string)",
-                value: input.note
+                value: input.docComment
             })].every(flag => flag); const _vo1 = (input, _path, _exceptionable = true) => ["string" === typeof input.name || _report(_exceptionable, {
                 path: _path + ".name",
                 expected: "string",
                 value: input.name
-            }), "string" === typeof input.email && (__typia_transform__isFormatEmail._isFormatEmail(input.email) || _report(_exceptionable, {
-                path: _path + ".email",
-                expected: "string & Format<\"email\">",
-                value: input.email
-            })) || _report(_exceptionable, {
-                path: _path + ".email",
-                expected: "(string & Format<\"email\">)",
-                value: input.email
-            })].every(flag => flag); const _vo2 = (input, _path, _exceptionable = true) => ["string" === typeof input.address1 || _report(_exceptionable, {
-                path: _path + ".address1",
+            }), (Array.isArray(input.parameters) || _report(_exceptionable, {
+                path: _path + ".parameters",
+                expected: "Array<ImaginaryParameterAst>",
+                value: input.parameters
+            })) && input.parameters.map((elem, _index7) => ("object" === typeof elem && null !== elem || _report(_exceptionable, {
+                path: _path + ".parameters[" + _index7 + "]",
+                expected: "ImaginaryParameterAst",
+                value: elem
+            })) && _vo2(elem, _path + ".parameters[" + _index7 + "]", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".parameters[" + _index7 + "]",
+                expected: "ImaginaryParameterAst",
+                value: elem
+            })).every(flag => flag) || _report(_exceptionable, {
+                path: _path + ".parameters",
+                expected: "Array<ImaginaryParameterAst>",
+                value: input.parameters
+            }), ("object" === typeof input.returnType && null !== input.returnType || _report(_exceptionable, {
+                path: _path + ".returnType",
+                expected: "ImaginaryTypeRefAst",
+                value: input.returnType
+            })) && _vo3(input.returnType, _path + ".returnType", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".returnType",
+                expected: "ImaginaryTypeRefAst",
+                value: input.returnType
+            }), ("object" === typeof input.body && null !== input.body || _report(_exceptionable, {
+                path: _path + ".body",
+                expected: "ImaginaryBlockAst",
+                value: input.body
+            })) && _vo4(input.body, _path + ".body", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".body",
+                expected: "ImaginaryBlockAst",
+                value: input.body
+            })].every(flag => flag); const _vo2 = (input, _path, _exceptionable = true) => ["string" === typeof input.name || _report(_exceptionable, {
+                path: _path + ".name",
                 expected: "string",
-                value: input.address1
-            }), "string" === typeof input.city || _report(_exceptionable, {
-                path: _path + ".city",
+                value: input.name
+            }), ("object" === typeof input.type && null !== input.type || _report(_exceptionable, {
+                path: _path + ".type",
+                expected: "ImaginaryTypeRefAst",
+                value: input.type
+            })) && _vo3(input.type, _path + ".type", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".type",
+                expected: "ImaginaryTypeRefAst",
+                value: input.type
+            })].every(flag => flag); const _vo3 = (input, _path, _exceptionable = true) => ["builtin" === input.kind || "named" === input.kind || _report(_exceptionable, {
+                path: _path + ".kind",
+                expected: "(\"builtin\" | \"named\")",
+                value: input.kind
+            }), "string" === typeof input.name || _report(_exceptionable, {
+                path: _path + ".name",
                 expected: "string",
-                value: input.city
-            }), "string" === typeof input.postalCode || _report(_exceptionable, {
-                path: _path + ".postalCode",
+                value: input.name
+            })].every(flag => flag); const _vo4 = (input, _path, _exceptionable = true) => [(Array.isArray(input.statements) || _report(_exceptionable, {
+                path: _path + ".statements",
+                expected: "Array<ImaginaryReturnStatementAst>",
+                value: input.statements
+            })) && input.statements.map((elem, _index8) => ("object" === typeof elem && null !== elem || _report(_exceptionable, {
+                path: _path + ".statements[" + _index8 + "]",
+                expected: "ImaginaryReturnStatementAst",
+                value: elem
+            })) && _vo5(elem, _path + ".statements[" + _index8 + "]", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".statements[" + _index8 + "]",
+                expected: "ImaginaryReturnStatementAst",
+                value: elem
+            })).every(flag => flag) || _report(_exceptionable, {
+                path: _path + ".statements",
+                expected: "Array<ImaginaryReturnStatementAst>",
+                value: input.statements
+            })].every(flag => flag); const _vo5 = (input, _path, _exceptionable = true) => ["return" === input.kind || _report(_exceptionable, {
+                path: _path + ".kind",
+                expected: "\"return\"",
+                value: input.kind
+            }), ("object" === typeof input.expression && null !== input.expression || _report(_exceptionable, {
+                path: _path + ".expression",
+                expected: "ImaginaryBinaryExpressionAst",
+                value: input.expression
+            })) && _vo6(input.expression, _path + ".expression", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".expression",
+                expected: "ImaginaryBinaryExpressionAst",
+                value: input.expression
+            })].every(flag => flag); const _vo6 = (input, _path, _exceptionable = true) => ["binary" === input.kind || _report(_exceptionable, {
+                path: _path + ".kind",
+                expected: "\"binary\"",
+                value: input.kind
+            }), "+" === input.operator || "-" === input.operator || "*" === input.operator || "/" === input.operator || _report(_exceptionable, {
+                path: _path + ".operator",
+                expected: "(\"*\" | \"+\" | \"-\" | \"/\")",
+                value: input.operator
+            }), ("object" === typeof input.left && null !== input.left || _report(_exceptionable, {
+                path: _path + ".left",
+                expected: "ImaginaryIdentifierAst",
+                value: input.left
+            })) && _vo7(input.left, _path + ".left", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".left",
+                expected: "ImaginaryIdentifierAst",
+                value: input.left
+            }), ("object" === typeof input.right && null !== input.right || _report(_exceptionable, {
+                path: _path + ".right",
+                expected: "ImaginaryIdentifierAst",
+                value: input.right
+            })) && _vo7(input.right, _path + ".right", true && _exceptionable) || _report(_exceptionable, {
+                path: _path + ".right",
+                expected: "ImaginaryIdentifierAst",
+                value: input.right
+            })].every(flag => flag); const _vo7 = (input, _path, _exceptionable = true) => ["identifier" === input.kind || _report(_exceptionable, {
+                path: _path + ".kind",
+                expected: "\"identifier\"",
+                value: input.kind
+            }), "string" === typeof input.name || _report(_exceptionable, {
+                path: _path + ".name",
                 expected: "string",
-                value: input.postalCode
-            })].every(flag => flag); const _vo3 = (input, _path, _exceptionable = true) => ["string" === typeof input.sku || _report(_exceptionable, {
-                path: _path + ".sku",
-                expected: "string",
-                value: input.sku
-            }), "number" === typeof input.quantity || _report(_exceptionable, {
-                path: _path + ".quantity",
-                expected: "number",
-                value: input.quantity
+                value: input.name
             })].every(flag => flag); const __is = input => "object" === typeof input && null !== input && _io0(input); let errors; let _report; return input => {
             if (false === __is(input)) {
                 errors = [];
                 _report = __typia_transform__validateReport._validateReport(errors);
                 ((input, _path, _exceptionable = true) => ("object" === typeof input && null !== input || _report(true, {
                     path: _path + "",
-                    expected: "OrderDraft",
+                    expected: "ImaginaryModuleAst",
                     value: input
                 })) && _vo0(input, _path + "", true) || _report(true, {
                     path: _path + "",
-                    expected: "OrderDraft",
+                    expected: "ImaginaryModuleAst",
                     value: input
                 }))(input, "$input", true);
                 const success = 0 === errors.length;
@@ -253,25 +451,25 @@ describe("OrderDraft schema fixtures", () => {
                 data: input
             };
         }; })()({
-            customer: {
-                name: "Alice",
-                email: "alice@example.com",
-            },
-            shipping: {
-                address1: "123 Main St",
-                city: "Seoul",
-                postalCode: "04524",
-            },
-            items: [
+            moduleName: "MathOps",
+            functions: [
                 {
-                    sku: "SKU-001",
-                    quantity: 2,
+                    name: "add",
+                    parameters: [],
+                    returnType: {
+                        kind: "builtin",
+                        name: "Int",
+                    },
+                    body: {
+                        statements: [],
+                    },
                 },
             ],
+            exports: ["add"],
         });
         expect(result.success).toBe(false);
         if (result.success === false) {
-            expect(result.errors.some((error) => error.path === "$input.note")).toBe(true);
+            expect(result.errors.some((error) => error.path === "$input.docComment")).toBe(true);
         }
     });
 });

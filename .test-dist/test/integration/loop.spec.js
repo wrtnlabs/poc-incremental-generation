@@ -1,30 +1,28 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const runOrderDraftLoop_1 = require("../../src/loop/runOrderDraftLoop");
-describe("runOrderDraftLoop", () => {
+const runAstCompletionLoop_1 = require("../../src/loop/runAstCompletionLoop");
+describe("runAstCompletionLoop", () => {
     it("converges across multiple partial patches", () => {
-        const result = (0, runOrderDraftLoop_1.runOrderDraftLoop)([
-            '{"draft":{"customer":{"name":"Alice"}}}',
-            '{"draft":{"customer":{"email":"alice@example.com"},"shipping":{"address1":"123 Main St","city":"Seoul","postalCode":"04524"}}}',
-            '{"draft":{"items":[{"sku":"SKU-001","quantity":2}],"note":null}}',
+        const result = (0, runAstCompletionLoop_1.runAstCompletionLoop)([
+            '{"ast":{"moduleName":"MathOps"}}',
+            '{"ast":{"functions":[{"name":"add","parameters":[{"name":"left","type":{"kind":"builtin","name":"Int"}},{"name":"right","type":{"kind":"builtin","name":"Int"}}],"returnType":{"kind":"builtin","name":"Int"}}]}}',
+            '{"ast":{"functions":[{"name":"add","parameters":[{"name":"left","type":{"kind":"builtin","name":"Int"}},{"name":"right","type":{"kind":"builtin","name":"Int"}}],"returnType":{"kind":"builtin","name":"Int"},"body":{"statements":[{"kind":"return","expression":{"kind":"binary","operator":"+","left":{"kind":"identifier","name":"left"},"right":{"kind":"identifier","name":"right"}}}]}}],"exports":["add"],"docComment":null}}',
         ]);
         expect(result.terminal).toBe("success");
         if (result.terminal === "success") {
-            expect(result.value.customer.email).toBe("alice@example.com");
-            expect(result.value.items[0].quantity).toBe(2);
+            expect(result.value.functions[0].name).toBe("add");
+            expect(result.value.functions[0].body.statements[0].expression.operator).toBe("+");
         }
     });
     it("stops with retry_exhausted when the sequence never completes", () => {
-        const result = (0, runOrderDraftLoop_1.runOrderDraftLoop)([
-            '{"draft":{"customer":{"name":"Alice"}}}',
-            '{"draft":{"customer":{"name":"Alice Again"}}}',
+        const result = (0, runAstCompletionLoop_1.runAstCompletionLoop)([
+            '{"ast":{"moduleName":"MathOps"}}',
+            '{"ast":{"moduleName":"MathOpsRenamed"}}',
         ]);
         expect(result.terminal).toBe("retry_exhausted");
         if (result.terminal === "retry_exhausted") {
             expect(result.candidate).toEqual({
-                customer: {
-                    name: "Alice Again",
-                },
+                moduleName: "MathOpsRenamed",
             });
         }
     });

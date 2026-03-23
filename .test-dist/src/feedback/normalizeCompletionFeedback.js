@@ -4,7 +4,7 @@ exports.normalizeCompletionFeedback = void 0;
 const normalizeCompletionFeedback = (analysis) => {
     if (analysis.complete) {
         return {
-            summary: "The order draft is complete.",
+            summary: "The AST is complete.",
             missing: [],
             incomplete: [],
             invalid: [],
@@ -18,8 +18,8 @@ const normalizeCompletionFeedback = (analysis) => {
         actual: issue.actual,
     }));
     const summary = missing.length > 0 || incomplete.length > 0
-        ? "The order draft is not complete yet. Add the missing branches first, then fill the remaining missing fields."
-        : "The order draft structure is complete, but one or more fields still need correction.";
+        ? "The AST is not complete yet. Add the missing branches first, then fill the remaining missing nodes."
+        : "The AST structure is complete, but one or more nodes still need correction.";
     return {
         summary,
         missing,

@@ -1,64 +1,78 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const analyzeOrderCompletion_1 = require("../../src/completeness/analyzeOrderCompletion");
-describe("analyzeOrderCompletion", () => {
+const analyzeAstCompletion_1 = require("../../src/completeness/analyzeAstCompletion");
+describe("analyzeAstCompletion", () => {
     it("reports a missing top-level branch", () => {
-        const analysis = (0, analyzeOrderCompletion_1.analyzeOrderCompletion)({
-            customer: {
-                name: "Alice",
-                email: "alice@example.com",
-            },
-            items: [
-                {
-                    sku: "SKU-001",
-                    quantity: 2,
-                },
-            ],
-            note: null,
+        const analysis = (0, analyzeAstCompletion_1.analyzeAstCompletion)({
+            moduleName: "MathOps",
+            exports: ["add"],
+            docComment: null,
         });
         expect(analysis.complete).toBe(false);
-        expect(analysis.missing.map((issue) => issue.path)).toContain("shipping");
+        expect(analysis.missing.map((issue) => issue.path)).toContain("functions");
     });
     it("reports incomplete nested objects and missing nested paths", () => {
-        const analysis = (0, analyzeOrderCompletion_1.analyzeOrderCompletion)({
-            customer: {
-                name: "Alice",
-            },
-            shipping: {
-                address1: "123 Main St",
-                city: "Seoul",
-                postalCode: "04524",
-            },
-            items: [
+        const analysis = (0, analyzeAstCompletion_1.analyzeAstCompletion)({
+            moduleName: "MathOps",
+            functions: [
                 {
-                    sku: "SKU-001",
-                    quantity: 2,
+                    name: "add",
+                    parameters: [],
+                    returnType: {
+                        kind: "builtin",
+                        name: "Int",
+                    },
                 },
             ],
-            note: null,
+            exports: ["add"],
+            docComment: null,
         });
-        expect(analysis.incomplete.map((issue) => issue.path)).toContain("customer");
-        expect(analysis.missing.map((issue) => issue.path)).toContain("customer.email");
+        expect(analysis.incomplete.map((issue) => issue.path)).toContain("functions[0]");
+        expect(analysis.missing.map((issue) => issue.path)).toContain("functions[0].body");
     });
     it("reports wrong scalar values as invalid", () => {
-        const analysis = (0, analyzeOrderCompletion_1.analyzeOrderCompletion)({
-            customer: {
-                name: "Alice",
-                email: "alice@example.com",
-            },
-            shipping: {
-                address1: "123 Main St",
-                city: "Seoul",
-                postalCode: "04524",
-            },
-            items: [
+        const analysis = (0, analyzeAstCompletion_1.analyzeAstCompletion)({
+            moduleName: "MathOps",
+            functions: [
                 {
-                    sku: "SKU-001",
-                    quantity: "2",
+                    name: "add",
+                    parameters: [
+                        {
+                            name: "left",
+                            type: {
+                                kind: "builtin",
+                                name: "Int",
+                            },
+                        },
+                    ],
+                    returnType: {
+                        kind: "builtin",
+                        name: "Int",
+                    },
+                    body: {
+                        statements: [
+                            {
+                                kind: "return",
+                                expression: {
+                                    kind: "binary",
+                                    operator: "plus",
+                                    left: {
+                                        kind: "identifier",
+                                        name: "left",
+                                    },
+                                    right: {
+                                        kind: "identifier",
+                                        name: "right",
+                                    },
+                                },
+                            },
+                        ],
+                    },
                 },
             ],
-            note: null,
+            exports: ["add"],
+            docComment: null,
         });
-        expect(analysis.invalid.map((issue) => issue.path)).toContain("items[0].quantity");
+        expect(analysis.invalid.map((issue) => issue.path)).toContain("functions[0].body.statements[0].expression.operator");
     });
 });

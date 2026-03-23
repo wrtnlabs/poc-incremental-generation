@@ -8,34 +8,34 @@ describe("normalizeCompletionFeedback", () => {
             missing: [
                 {
                     kind: "missing",
-                    path: "shipping",
+                    path: "functions",
                     expected: "object",
                 },
             ],
             incomplete: [
                 {
                     kind: "incomplete",
-                    path: "customer",
+                    path: "functions[0]",
                     expected: "object",
                 },
             ],
             invalid: [
                 {
                     kind: "invalid",
-                    path: "items[0].quantity",
-                    expected: "number",
-                    actual: "2",
+                    path: "functions[0].body.statements[0].expression.operator",
+                    expected: '"+" | "-" | "*" | "/"',
+                    actual: "plus",
                 },
             ],
         });
-        expect(feedback.summary).toContain("not complete yet");
-        expect(feedback.missing).toEqual(["shipping"]);
-        expect(feedback.incomplete).toEqual(["customer"]);
+        expect(feedback.summary).toContain("AST is not complete yet");
+        expect(feedback.missing).toEqual(["functions"]);
+        expect(feedback.incomplete).toEqual(["functions[0]"]);
         expect(feedback.invalid).toEqual([
             {
-                path: "items[0].quantity",
-                expected: "number",
-                actual: "2",
+                path: "functions[0].body.statements[0].expression.operator",
+                expected: '"+" | "-" | "*" | "/"',
+                actual: "plus",
             },
         ]);
     });
@@ -47,9 +47,9 @@ describe("normalizeCompletionFeedback", () => {
             invalid: [
                 {
                     kind: "invalid",
-                    path: "items[0].quantity",
-                    expected: "number",
-                    actual: "2",
+                    path: "functions[0].body.statements[0].expression.operator",
+                    expected: '"+" | "-" | "*" | "/"',
+                    actual: "plus",
                 },
             ],
         });

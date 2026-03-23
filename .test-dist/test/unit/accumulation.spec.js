@@ -1,58 +1,37 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const mergeOrderPatch_1 = require("../../src/accumulation/mergeOrderPatch");
-describe("mergeOrderPatch", () => {
+const mergeAstPatch_1 = require("../../src/accumulation/mergeAstPatch");
+describe("mergeAstPatch", () => {
     it("deep merges objects while overwriting scalars", () => {
-        const merged = (0, mergeOrderPatch_1.mergeOrderPatch)({
-            customer: {
-                name: "Alice",
-            },
+        const merged = (0, mergeAstPatch_1.mergeAstPatch)({
+            moduleName: "MathOps",
         }, {
-            customer: {
-                email: "alice@example.com",
-            },
+            docComment: null,
         });
         expect(merged).toEqual({
-            customer: {
-                name: "Alice",
-                email: "alice@example.com",
-            },
+            moduleName: "MathOps",
+            docComment: null,
         });
     });
     it("replaces arrays as a whole", () => {
-        const merged = (0, mergeOrderPatch_1.mergeOrderPatch)({
-            items: [
-                {
-                    sku: "OLD",
-                    quantity: 1,
-                },
-            ],
+        const merged = (0, mergeAstPatch_1.mergeAstPatch)({
+            exports: ["oldValue"],
         }, {
-            items: [
-                {
-                    sku: "NEW",
-                    quantity: 2,
-                },
-            ],
+            exports: ["add"],
         });
         expect(merged).toEqual({
-            items: [
-                {
-                    sku: "NEW",
-                    quantity: 2,
-                },
-            ],
+            exports: ["add"],
         });
     });
     it("ignores undefined and preserves null", () => {
-        const merged = (0, mergeOrderPatch_1.mergeOrderPatch)({
-            note: "keep me",
+        const merged = (0, mergeAstPatch_1.mergeAstPatch)({
+            docComment: "keep me",
         }, {
-            note: null,
-            shipping: undefined,
+            docComment: null,
+            functions: undefined,
         });
         expect(merged).toEqual({
-            note: null,
+            docComment: null,
         });
     });
 });
