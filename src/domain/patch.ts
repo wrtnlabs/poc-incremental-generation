@@ -1,11 +1,11 @@
 import type { DeepPartial } from "@typia/interface";
 
-import type { OrderDraft } from "./order";
+import type { ImaginaryModuleAst } from "./ast";
 
-export type OrderPatch = DeepPartial<OrderDraft>;
+export type AstPatch = DeepPartial<ImaginaryModuleAst>;
 
-export interface IOrderPatchApplication {
+export interface IAstPatchApplication {
   submit(props: {
-    draft: OrderPatch;
+    ast: AstPatch;
   }): void;
 }
