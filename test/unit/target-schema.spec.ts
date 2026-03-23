@@ -1,51 +1,82 @@
 import typia from "typia";
 
-import type { OrderDraft } from "../../src/domain/order";
+import type { ImaginaryModuleAst } from "../../src/domain/ast";
 
-describe("OrderDraft schema fixtures", () => {
+describe("ImaginaryModuleAst schema fixtures", () => {
   it("accepts a fully complete object", () => {
-    const result = typia.validate<OrderDraft>({
-      customer: {
-        name: "Alice",
-        email: "alice@example.com",
-      },
-      shipping: {
-        address1: "123 Main St",
-        city: "Seoul",
-        postalCode: "04524",
-      },
-      items: [
+    const result = typia.validate<ImaginaryModuleAst>({
+      moduleName: "MathOps",
+      functions: [
         {
-          sku: "SKU-001",
-          quantity: 2,
+          name: "add",
+          parameters: [
+            {
+              name: "left",
+              type: {
+                kind: "builtin",
+                name: "Int",
+              },
+            },
+            {
+              name: "right",
+              type: {
+                kind: "builtin",
+                name: "Int",
+              },
+            },
+          ],
+          returnType: {
+            kind: "builtin",
+            name: "Int",
+          },
+          body: {
+            statements: [
+              {
+                kind: "return",
+                expression: {
+                  kind: "binary",
+                  operator: "+",
+                  left: {
+                    kind: "identifier",
+                    name: "left",
+                  },
+                  right: {
+                    kind: "identifier",
+                    name: "right",
+                  },
+                },
+              },
+            ],
+          },
         },
       ],
-      note: null,
+      exports: ["add"],
+      docComment: null,
     });
     expect(result.success).toBe(true);
   });
 
-  it("treats omitted required nullable note as missing", () => {
-    const result = typia.validate<OrderDraft>({
-      customer: {
-        name: "Alice",
-        email: "alice@example.com",
-      },
-      shipping: {
-        address1: "123 Main St",
-        city: "Seoul",
-        postalCode: "04524",
-      },
-      items: [
+  it("treats omitted required nullable docComment as missing", () => {
+    const result = typia.validate<ImaginaryModuleAst>({
+      moduleName: "MathOps",
+      functions: [
         {
-          sku: "SKU-001",
-          quantity: 2,
+          name: "add",
+          parameters: [],
+          returnType: {
+            kind: "builtin",
+            name: "Int",
+          },
+          body: {
+            statements: [],
+          },
         },
       ],
+      exports: ["add"],
     });
     expect(result.success).toBe(false);
     if (result.success === false) {
-      expect(result.errors.some((error) => error.path === "$input.note")).toBe(true);
+      expect(result.errors.some((error) => error.path === "$input.docComment")).toBe(true);
     }
   });
 });
