@@ -1,13 +1,13 @@
 import type { IJsonParseResult, IValidation } from "typia";
 import typia from "typia";
 
-import type { IOrderPatchApplication, OrderPatch } from "../domain/patch";
+import type { AstPatch, IAstPatchApplication } from "../domain/patch";
 
 interface ISubmitProps {
-  draft: OrderPatch;
+  ast: AstPatch;
 }
 
-const PATCH_APPLICATION = typia.llm.application<IOrderPatchApplication>();
+const PATCH_APPLICATION = typia.llm.application<IAstPatchApplication>();
 const PATCH_FUNCTION = PATCH_APPLICATION.functions.find(
   (func) => func.name === "submit",
 );
@@ -19,7 +19,7 @@ if (PATCH_FUNCTION === undefined) {
 export type IngressResult =
   | {
       success: true;
-      draft: OrderPatch;
+      ast: AstPatch;
     }
   | {
       success: false;
@@ -37,7 +37,7 @@ export type IngressResult =
       partial: unknown;
     };
 
-export const parseOrderPatch = (input: string): IngressResult => {
+export const parseAstPatch = (input: string): IngressResult => {
   const parsed: IJsonParseResult<ISubmitProps> =
     PATCH_FUNCTION.parse(input) as IJsonParseResult<ISubmitProps>;
   if (parsed.success === false) {
@@ -66,6 +66,6 @@ export const parseOrderPatch = (input: string): IngressResult => {
   }
   return {
     success: true,
-    draft: validation.data.draft,
+    ast: validation.data.ast,
   };
 };

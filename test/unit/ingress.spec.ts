@@ -1,32 +1,28 @@
-import { parseOrderPatch } from "../../src/ingress/parseOrderPatch";
+import { parseAstPatch } from "../../src/ingress/parseAstPatch";
 
-describe("parseOrderPatch", () => {
+describe("parseAstPatch", () => {
   it("parses a valid patch", () => {
-    const result = parseOrderPatch('{"draft":{"customer":{"name":"Alice"}}}');
+    const result = parseAstPatch('{"ast":{"moduleName":"MathOps"}}');
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.draft).toEqual({
-        customer: {
-          name: "Alice",
-        },
+      expect(result.ast).toEqual({
+        moduleName: "MathOps",
       });
     }
   });
 
   it("recovers malformed but recoverable JSON", () => {
-    const result = parseOrderPatch('{draft:{customer:{name:"Alice"}}}');
+    const result = parseAstPatch('{ast:{moduleName:"MathOps"}}');
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.draft).toEqual({
-        customer: {
-          name: "Alice",
-        },
+      expect(result.ast).toEqual({
+        moduleName: "MathOps",
       });
     }
   });
 
   it("fails on unrecoverable input", () => {
-    const result = parseOrderPatch('this is not json');
+    const result = parseAstPatch('this is not json');
     expect(result.success).toBe(false);
     if (result.success === false) {
       expect(result.kind).toBe("parse_error");
