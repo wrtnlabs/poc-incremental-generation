@@ -2,21 +2,21 @@ import { MicroAgentica } from "@agentica/core";
 import OpenAI from "openai";
 import typia from "typia";
 
-import type { OrderPatch } from "../domain/patch";
+import type { AstPatch } from "../domain/patch";
 import type { MicroAgenticaRuntimeConfig } from "./readMicroAgenticaRuntimeConfig";
-import type { RequestPatch } from "./runRequestedOrderDraftLoop";
+import type { RequestPatch } from "./runRequestedAstCompletionLoop";
 
-class OrderPatchSubmissionController {
+class AstPatchSubmissionController {
   public constructor(
-    private readonly submitter: (draft: OrderPatch) => void,
+    private readonly submitter: (ast: AstPatch) => void,
   ) {}
 
   public submit(props: {
-    draft: OrderPatch;
+    ast: AstPatch;
   }): {
     accepted: true;
   } {
-    this.submitter(props.draft);
+    this.submitter(props.ast);
     return {
       accepted: true,
     };
@@ -27,13 +27,16 @@ const buildPrompt = (props: {
   objective: string;
   attempt: number;
   maxAttempts: number;
-  candidate: OrderPatch;
+  candidate: AstPatch;
   latestFeedback: unknown;
-}): string => `You are filling an order draft over multiple attempts.
+}): string => `You are building an AST for a fictional language over multiple attempts.
 
 Call the submit tool exactly once.
 Return only the delta patch that should be added or corrected now.
 Do not return the full object unless the full object is still the smallest correct delta.
+
+The final target is a module AST.
+Every function body should be represented as AST nodes, not source code text.
 
 Attempt: ${props.attempt}/${props.maxAttempts}
 Objective:
@@ -49,9 +52,9 @@ ${JSON.stringify(props.latestFeedback, null, 2)}
 export const createMicroAgenticaPatchRequester = (
   config: MicroAgenticaRuntimeConfig,
 ): RequestPatch => {
-  let latestPatch: OrderPatch | undefined;
-  const controller = new OrderPatchSubmissionController((draft) => {
-    latestPatch = draft;
+  let latestPatch: AstPatch | undefined;
+  const controller = new AstPatchSubmissionController((ast) => {
+    latestPatch = ast;
   });
 
   const agent = new MicroAgentica({
@@ -63,8 +66,8 @@ export const createMicroAgenticaPatchRequester = (
       model: config.model,
     },
     controllers: [
-      typia.llm.controller<OrderPatchSubmissionController>(
-        "orderPatch",
+      typia.llm.controller<AstPatchSubmissionController>(
+        "astPatch",
         controller,
       ),
     ],

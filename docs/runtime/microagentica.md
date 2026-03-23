@@ -28,8 +28,8 @@ pnpm runner:micro
 ## Behavior
 
 - `MicroAgentica` is asked to call a single `submit` tool.
-- The tool accepts `DeepPartial<OrderDraft>` patches.
-- Each submitted patch is serialized to the existing `{"draft": ...}` format.
+- The tool accepts `DeepPartial<ImaginaryModuleAst>` patches.
+- Each submitted patch is serialized to the existing `{"ast": ...}` format.
 - The existing merge and strict completion logic remains the source of truth.
 
 ## Important Caveat
