@@ -32,6 +32,44 @@ describe("runRequestedAstCompletionLoop", () => {
               name: "Int",
             },
           },
+          {
+            name: "scaleAndShift",
+            parameters: [
+              {
+                name: "value",
+                type: {
+                  kind: "builtin",
+                  name: "Int",
+                },
+              },
+              {
+                name: "factor",
+                type: {
+                  kind: "builtin",
+                  name: "Int",
+                },
+              },
+              {
+                name: "offset",
+                type: {
+                  kind: "builtin",
+                  name: "Int",
+                },
+              },
+            ],
+            returnType: {
+              kind: "builtin",
+              name: "Int",
+            },
+          },
+          {
+            name: "compute",
+            parameters: [],
+            returnType: {
+              kind: "builtin",
+              name: "Int",
+            },
+          },
         ],
       },
       {
@@ -78,8 +116,108 @@ describe("runRequestedAstCompletionLoop", () => {
               ],
             },
           },
+          {
+            name: "scaleAndShift",
+            parameters: [
+              {
+                name: "value",
+                type: {
+                  kind: "builtin",
+                  name: "Int",
+                },
+              },
+              {
+                name: "factor",
+                type: {
+                  kind: "builtin",
+                  name: "Int",
+                },
+              },
+              {
+                name: "offset",
+                type: {
+                  kind: "builtin",
+                  name: "Int",
+                },
+              },
+            ],
+            returnType: {
+              kind: "builtin",
+              name: "Int",
+            },
+            body: {
+              statements: [
+                {
+                  kind: "return",
+                  expression: {
+                    kind: "binary",
+                    operator: "+",
+                    left: {
+                      kind: "binary",
+                      operator: "*",
+                      left: {
+                        kind: "identifier",
+                        name: "value",
+                      },
+                      right: {
+                        kind: "identifier",
+                        name: "factor",
+                      },
+                    },
+                    right: {
+                      kind: "identifier",
+                      name: "offset",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            name: "compute",
+            parameters: [],
+            returnType: {
+              kind: "builtin",
+              name: "Int",
+            },
+            body: {
+              statements: [
+                {
+                  kind: "return",
+                  expression: {
+                    kind: "call",
+                    callee: "scaleAndShift",
+                    arguments: [
+                      {
+                        kind: "call",
+                        callee: "add",
+                        arguments: [
+                          {
+                            kind: "literal",
+                            value: 1,
+                          },
+                          {
+                            kind: "literal",
+                            value: 2,
+                          },
+                        ],
+                      },
+                      {
+                        kind: "literal",
+                        value: 3,
+                      },
+                      {
+                        kind: "literal",
+                        value: 4,
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
         ],
-        exports: ["add"],
+        exports: ["add", "scaleAndShift", "compute"],
         docComment: null,
       },
     ];
@@ -92,7 +230,7 @@ describe("runRequestedAstCompletionLoop", () => {
 
     expect(result.terminal).toBe("success");
     if (result.terminal === "success") {
-      expect(result.value.functions[0].name).toBe("add");
+      expect(result.value.functions[2].body.statements[0].expression.kind).toBe("call");
     }
   });
 

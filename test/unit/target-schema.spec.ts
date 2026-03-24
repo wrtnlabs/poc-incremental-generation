@@ -49,8 +49,108 @@ describe("ImaginaryModuleAst schema fixtures", () => {
             ],
           },
         },
+        {
+          name: "scaleAndShift",
+          parameters: [
+            {
+              name: "value",
+              type: {
+                kind: "builtin",
+                name: "Int",
+              },
+            },
+            {
+              name: "factor",
+              type: {
+                kind: "builtin",
+                name: "Int",
+              },
+            },
+            {
+              name: "offset",
+              type: {
+                kind: "builtin",
+                name: "Int",
+              },
+            },
+          ],
+          returnType: {
+            kind: "builtin",
+            name: "Int",
+          },
+          body: {
+            statements: [
+              {
+                kind: "return",
+                expression: {
+                  kind: "binary",
+                  operator: "+",
+                  left: {
+                    kind: "binary",
+                    operator: "*",
+                    left: {
+                      kind: "identifier",
+                      name: "value",
+                    },
+                    right: {
+                      kind: "identifier",
+                      name: "factor",
+                    },
+                  },
+                  right: {
+                    kind: "identifier",
+                    name: "offset",
+                  },
+                },
+              },
+            ],
+          },
+        },
+        {
+          name: "compute",
+          parameters: [],
+          returnType: {
+            kind: "builtin",
+            name: "Int",
+          },
+          body: {
+            statements: [
+              {
+                kind: "return",
+                expression: {
+                  kind: "call",
+                  callee: "scaleAndShift",
+                  arguments: [
+                    {
+                      kind: "call",
+                      callee: "add",
+                      arguments: [
+                        {
+                          kind: "literal",
+                          value: 1,
+                        },
+                        {
+                          kind: "literal",
+                          value: 2,
+                        },
+                      ],
+                    },
+                    {
+                      kind: "literal",
+                      value: 3,
+                    },
+                    {
+                      kind: "literal",
+                      value: 4,
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
       ],
-      exports: ["add"],
+      exports: ["add", "scaleAndShift", "compute"],
       docComment: null,
     });
     expect(result.success).toBe(true);

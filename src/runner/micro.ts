@@ -7,12 +7,20 @@ import { runRequestedAstCompletionLoop } from "../runtime/runRequestedAstComplet
 
 const OBJECTIVE = `Create an AST for a fictional language module named MathOps.
 
-- exports: ["add"]
+- exports: ["add", "scaleAndShift", "compute"]
 - docComment: null
 - one function named add
 - parameters: left: Int, right: Int
 - returnType: Int
 - function body: return left + right
+- one function named scaleAndShift
+- parameters: value: Int, factor: Int, offset: Int
+- returnType: Int
+- function body: return value * factor + offset
+- one function named compute
+- parameters: none
+- returnType: Int
+- function body: return scaleAndShift(add(1, 2), 3, 4)
 - generate AST nodes only, never source code text as the final artifact
 `;
 

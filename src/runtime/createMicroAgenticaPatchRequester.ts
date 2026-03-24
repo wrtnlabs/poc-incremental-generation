@@ -3,7 +3,12 @@ import OpenAI from "openai";
 import typia from "typia";
 
 import type { AstPatch } from "../domain/patch";
+import {
+  formatMicroAgenticaRequestLog,
+  formatMicroAgenticaResponseLog,
+} from "../runner/formatProgressLog";
 import type { MicroAgenticaRuntimeConfig } from "./readMicroAgenticaRuntimeConfig";
+import { describeAstStageRule } from "./stageAstPatch";
 import type { RequestPatch } from "./runRequestedAstCompletionLoop";
 
 class AstPatchSubmissionController {
@@ -23,13 +28,29 @@ class AstPatchSubmissionController {
   }
 }
 
+const getRequiredMissingPaths = (latestFeedback: unknown): string[] => {
+  if (
+    typeof latestFeedback !== "object" ||
+    latestFeedback === null ||
+    Array.isArray(latestFeedback) === true
+  ) {
+    return [];
+  }
+  const missing: unknown = (latestFeedback as { missing?: unknown }).missing;
+  return Array.isArray(missing)
+    ? missing.filter((value): value is string => typeof value === "string")
+    : [];
+};
+
 const buildPrompt = (props: {
   objective: string;
   attempt: number;
   maxAttempts: number;
   candidate: AstPatch;
   latestFeedback: unknown;
-}): string => `You are building an AST for a fictional language over multiple attempts.
+}): string => {
+  const requiredMissingPaths = getRequiredMissingPaths(props.latestFeedback);
+  return `You are building an AST for a fictional language over multiple attempts.
 
 Call the submit tool exactly once.
 Return only the delta patch that should be added or corrected now.
@@ -47,7 +68,17 @@ ${JSON.stringify(props.candidate, null, 2)}
 
 Latest feedback:
 ${JSON.stringify(props.latestFeedback, null, 2)}
+
+Stage rule for this attempt:
+${describeAstStageRule(props.attempt)}
+
+Required missing paths to address now:
+${requiredMissingPaths.length === 0 ? "none" : requiredMissingPaths.join(", ")}
+
+If the remaining missing paths are top-level keys such as exports or docComment, this patch MUST include those top-level keys.
+If you are not correcting function internals on this attempt, do not resend unchanged functions.
 `;
+};
 
 export const createMicroAgenticaPatchRequester = (
   config: MicroAgenticaRuntimeConfig,
@@ -81,6 +112,12 @@ export const createMicroAgenticaPatchRequester = (
 
   return async (context) => {
     latestPatch = undefined;
+    console.log(formatMicroAgenticaRequestLog({
+      attempt: context.attempt,
+      maxAttempts: context.maxAttempts,
+      model: config.model,
+      hasCustomBaseUrl: config.baseURL !== undefined,
+    }));
     await agent.conversate(
       buildPrompt({
         objective: context.objective,
@@ -93,6 +130,10 @@ export const createMicroAgenticaPatchRequester = (
     if (latestPatch === undefined) {
       throw new Error("MicroAgentica did not submit a patch.");
     }
+    console.log(formatMicroAgenticaResponseLog({
+      attempt: context.attempt,
+      patch: latestPatch,
+    }));
     return latestPatch;
   };
 };

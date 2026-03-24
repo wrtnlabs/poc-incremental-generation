@@ -4,6 +4,12 @@ import {
   type LoopAttempt,
   type LoopResult,
 } from "../loop/runAstCompletionLoop";
+import {
+  formatAttemptResultLog,
+  formatAttemptStartLog,
+  formatPatchReceivedLog,
+} from "../runner/formatProgressLog";
+import { stageAstPatch, wasAstPatchStaged } from "./stageAstPatch";
 
 export interface PatchRequestContext {
   objective: string;
@@ -35,7 +41,7 @@ export const runRequestedAstCompletionLoop = async (
 
   for (let index = 0; index < maxAttempts; ++index) {
     const snapshot: LoopResult | null = getLoopSnapshot(rawPatches);
-    const patch: AstPatch = await props.requestPatch({
+    const context = {
       objective: props.objective,
       attempt: index + 1,
       maxAttempts,
@@ -45,10 +51,39 @@ export const runRequestedAstCompletionLoop = async (
           : snapshot?.candidate ?? {},
       attempts: snapshot?.attempts ?? [],
       latestFeedback: snapshot?.attempts.at(-1)?.feedback ?? null,
+    };
+    console.log(formatAttemptStartLog(context));
+    const patch: AstPatch = await props.requestPatch(context);
+    console.log(formatPatchReceivedLog({
+      attempt: context.attempt,
+      patch,
+    }));
+    const stagedPatch: AstPatch = stageAstPatch({
+      attempt: context.attempt,
+      patch,
     });
-    rawPatches.push(JSON.stringify({ ast: patch }));
+    if (
+      wasAstPatchStaged({
+        attempt: context.attempt,
+        original: patch,
+        staged: stagedPatch,
+      })
+    ) {
+      console.log(
+        `[Workflow] Attempt ${context.attempt} stage gate trimmed the patch before evaluation`,
+      );
+    }
+    rawPatches.push(JSON.stringify({ ast: stagedPatch }));
 
     const result: LoopResult = runAstCompletionLoop(rawPatches, rawPatches.length);
+    const latestAnalysis = result.attempts.at(-1)?.analysis;
+    console.log(formatAttemptResultLog({
+      attempt: context.attempt,
+      terminal: result.terminal === "success",
+      missing: latestAnalysis?.missing.length ?? 0,
+      incomplete: latestAnalysis?.incomplete.length ?? 0,
+      invalid: latestAnalysis?.invalid.length ?? 0,
+    }));
     if (result.terminal === "success") {
       return result;
     }

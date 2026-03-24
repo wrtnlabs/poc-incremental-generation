@@ -4,7 +4,7 @@ describe("analyzeAstCompletion", () => {
   it("reports a missing top-level branch", () => {
     const analysis = analyzeAstCompletion({
       moduleName: "MathOps",
-      exports: ["add"],
+      exports: ["add", "scaleAndShift", "compute"],
       docComment: null,
     });
     expect(analysis.complete).toBe(false);
@@ -16,7 +16,7 @@ describe("analyzeAstCompletion", () => {
       moduleName: "MathOps",
       functions: [
         {
-          name: "add",
+          name: "compute",
           parameters: [],
           returnType: {
             kind: "builtin",
@@ -24,7 +24,7 @@ describe("analyzeAstCompletion", () => {
           },
         },
       ],
-      exports: ["add"],
+      exports: ["compute"],
       docComment: null,
     });
     expect(analysis.incomplete.map((issue) => issue.path)).toContain("functions[0]");
@@ -36,10 +36,24 @@ describe("analyzeAstCompletion", () => {
       moduleName: "MathOps",
       functions: [
         {
-          name: "add",
+          name: "scaleAndShift",
           parameters: [
             {
-              name: "left",
+              name: "value",
+              type: {
+                kind: "builtin",
+                name: "Int",
+              },
+            },
+            {
+              name: "factor",
+              type: {
+                kind: "builtin",
+                name: "Int",
+              },
+            },
+            {
+              name: "offset",
               type: {
                 kind: "builtin",
                 name: "Int",
@@ -58,12 +72,20 @@ describe("analyzeAstCompletion", () => {
                   kind: "binary",
                   operator: "plus",
                   left: {
-                    kind: "identifier",
-                    name: "left",
+                    kind: "binary",
+                    operator: "*",
+                    left: {
+                      kind: "identifier",
+                      name: "value",
+                    },
+                    right: {
+                      kind: "identifier",
+                      name: "factor",
+                    },
                   },
                   right: {
                     kind: "identifier",
-                    name: "right",
+                    name: "offset",
                   },
                 },
               },
@@ -71,7 +93,7 @@ describe("analyzeAstCompletion", () => {
           },
         },
       ],
-      exports: ["add"],
+      exports: ["scaleAndShift"],
       docComment: null,
     });
     expect(analysis.invalid.map((issue) => issue.path)).toContain(

@@ -28,17 +28,34 @@ export interface ImaginaryBlockAst {
 
 export interface ImaginaryReturnStatementAst {
   kind: "return";
-  expression: ImaginaryBinaryExpressionAst;
+  expression: ImaginaryExpressionAst;
 }
+
+export type ImaginaryExpressionAst =
+  | ImaginaryBinaryExpressionAst
+  | ImaginaryCallExpressionAst
+  | ImaginaryIdentifierAst
+  | ImaginaryLiteralAst;
 
 export interface ImaginaryBinaryExpressionAst {
   kind: "binary";
   operator: "+" | "-" | "*" | "/";
-  left: ImaginaryIdentifierAst;
-  right: ImaginaryIdentifierAst;
+  left: ImaginaryExpressionAst;
+  right: ImaginaryExpressionAst;
+}
+
+export interface ImaginaryCallExpressionAst {
+  kind: "call";
+  callee: string;
+  arguments: ImaginaryExpressionAst[];
 }
 
 export interface ImaginaryIdentifierAst {
   kind: "identifier";
   name: string;
+}
+
+export interface ImaginaryLiteralAst {
+  kind: "literal";
+  value: number;
 }
