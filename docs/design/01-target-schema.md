@@ -2,254 +2,87 @@
 
 ## Purpose
 
-The first prototype needs exactly one target type `T` that is small enough to reason about quickly and complex enough to exercise recursive completion.
+The project target is now a fictional-language module AST.
 
-This document locks that type and the examples that define complete, incomplete, and invalid states.
+The generator does not produce source code directly. It produces `DeepPartial<ImaginaryModuleAst>` patches that are merged and validated until the system accepts a strict `ImaginaryModuleAst`.
 
-## Selection Criteria
-
-The target type must satisfy all of the following:
-
-- at least two required top-level branches
-- at least one required nested object
-- at least one array field
-- scalar leaves with obvious type expectations
-- at least one nullable field so `null` and missing can be distinguished
-- no complex union logic in the first prototype
-
-## Chosen Target Shape
-
-The prototype target is an order draft.
+## Target Type
 
 ```ts
-type OrderDraft = {
-  customer: {
-    name: string;
-    email: string;
-  };
-  shipping: {
-    address1: string;
-    city: string;
-    postalCode: string;
-  };
-  items: Array<{
-    sku: string;
-    quantity: number;
-  }>;
-  note: string | null;
+type ImaginaryModuleAst = {
+  moduleName: string;
+  functions: ImaginaryFunctionAst[];
+  exports: string[];
+  docComment: string | null;
 };
 ```
 
-## Why This Shape
+The current AST supports:
 
-This shape is intentionally narrow.
+- multiple functions
+- typed parameters
+- recursive expressions
+- binary expressions
+- call expressions
+- assignment statements
+- if statements
+- property access expressions
+- numeric literals
+- identifier references
 
-- `customer` tests nested required scalars
-- `shipping` tests a second required object branch
-- `items` tests array handling and the rule that arrays are replaced as a whole
-- `note` tests explicit nullable handling
+## Current Canonical Objective
 
-It is rich enough to make `missing`, `incomplete`, and `invalid` meaningfully different without introducing union-related instability.
+The current runner family demonstrates a module named `AnalyticsOps` with three functions:
 
-## LLM Contract
+- `add(left, right): Int => left + right`
+- `computeScore(input: Input): Int` using assignment, property access, and an `if` branch
+- `normalizeScore(score: Int): Int` using an `if` branch with a comparison operator
 
-The LLM never sees `OrderDraft` directly as a strict completion target.
+This target is intentionally complex enough to exercise:
 
-The LLM-facing contract is:
+- nested arrays
+- recursive expression trees
+- multi-function consistency
+- top-level metadata completion
+
+## Patch Contract
+
+The accepted patch shape is:
 
 ```ts
-DeepPartial<OrderDraft>
+DeepPartial<ImaginaryModuleAst>
 ```
 
-This means any retry may legally return only a small patch such as:
+Examples of valid partial patches:
 
 ```ts
-{ customer: { email: "alice@example.com" } }
+{ moduleName: "AnalyticsOps" }
 ```
-
-or:
 
 ```ts
-{ items: [{ sku: "SKU-001", quantity: 2 }] }
-```
-
-## Complete Example
-
-```json
 {
-  "customer": {
-    "name": "Alice",
-    "email": "alice@example.com"
-  },
-  "shipping": {
-    "address1": "123 Main St",
-    "city": "Seoul",
-    "postalCode": "04524"
-  },
-  "items": [
+  functions: [
     {
-      "sku": "SKU-001",
-      "quantity": 2
-    }
+      name: "computeScore",
+      parameters: [
+        { name: "input", type: { kind: "named", name: "Input" } },
+      ],
+      returnType: { kind: "builtin", name: "Int" },
+    },
   ],
-  "note": null
 }
 ```
 
-## Incomplete Examples
+## Acceptance Rule
 
-### Missing Top-Level Branch
+The object is accepted only when:
 
-```json
-{
-  "customer": {
-    "name": "Alice",
-    "email": "alice@example.com"
-  },
-  "items": [
-    {
-      "sku": "SKU-001",
-      "quantity": 2
-    }
-  ],
-  "note": null
-}
-```
+- all required top-level fields exist
+- all required nested AST nodes exist
+- `typia.validate<ImaginaryModuleAst>()` passes
 
-Expected classification:
-
-- missing: `shipping`
-
-### Missing Nested Field
-
-```json
-{
-  "customer": {
-    "name": "Alice"
-  },
-  "shipping": {
-    "address1": "123 Main St",
-    "city": "Seoul",
-    "postalCode": "04524"
-  },
-  "items": [
-    {
-      "sku": "SKU-001",
-      "quantity": 2
-    }
-  ],
-  "note": null
-}
-```
-
-Expected classification:
-
-- incomplete: `customer`
-- missing: `customer.email`
-
-### Missing Array Branch
-
-```json
-{
-  "customer": {
-    "name": "Alice",
-    "email": "alice@example.com"
-  },
-  "shipping": {
-    "address1": "123 Main St",
-    "city": "Seoul",
-    "postalCode": "04524"
-  },
-  "note": null
-}
-```
-
-Expected classification:
-
-- missing: `items`
-
-## Invalid Examples
-
-### Wrong Scalar Type
-
-```json
-{
-  "customer": {
-    "name": "Alice",
-    "email": "alice@example.com"
-  },
-  "shipping": {
-    "address1": "123 Main St",
-    "city": "Seoul",
-    "postalCode": "04524"
-  },
-  "items": [
-    {
-      "sku": "SKU-001",
-      "quantity": "2"
-    }
-  ],
-  "note": null
-}
-```
-
-Expected classification:
-
-- invalid: `items[0].quantity`
-
-### Null vs Missing
-
-```json
-{
-  "customer": {
-    "name": "Alice",
-    "email": "alice@example.com"
-  },
-  "shipping": {
-    "address1": "123 Main St",
-    "city": "Seoul",
-    "postalCode": "04524"
-  },
-  "items": [
-    {
-      "sku": "SKU-001",
-      "quantity": 2
-    }
-  ]
-}
-```
-
-Expected classification:
-
-- missing: none for `note` if omission is accepted only when `note` is optional
-- invalid or missing for `note` if the chosen strict schema keeps it required even when nullable
-
-For the first prototype, the simplest choice is:
-
-- `note` is required
-- `note` may be `null`
-
-That means omission of `note` is still missing, while `note: null` is valid.
-
-## Acceptance Decision
-
-The object is accepted only when all required branches are present and strict validation against `OrderDraft` passes.
-
-No amount of partial parsing or coercion can override this decision.
-
-## Unit 1 QA
-
-Tool:
-
-- schema fixture review and unit tests
-
-Command:
+## QA
 
 ```bash
 pnpm test -- --runInBand test/unit/target-schema.spec.ts
 ```
-
-Expected result:
-
-- the chosen target type supports unambiguous complete, incomplete, and invalid fixtures
-- the nullable field rule is explicitly testable

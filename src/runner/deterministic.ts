@@ -1,4 +1,5 @@
-import { runAstCompletionLoop } from "../../src/loop/runAstCompletionLoop";
+import { formatTerminalCompletionLog } from "./formatTerminalCompletionLog";
+import { runAstCompletionLoop } from "../loop/runAstCompletionLoop";
 
 const serializeAstPatch = (ast: unknown): string => JSON.stringify({ ast });
 
@@ -60,7 +61,11 @@ const completePatch = {
       returnType: { kind: "builtin", name: "Int" },
       body: {
         statements: [
-          { kind: "let", name: "total", expression: { kind: "literal", value: 0 } },
+          {
+            kind: "let",
+            name: "total",
+            expression: { kind: "literal", value: 0 },
+          },
           {
             kind: "let",
             name: "current",
@@ -127,7 +132,10 @@ const completePatch = {
               ],
             },
           },
-          { kind: "return", expression: { kind: "identifier", name: "total" } },
+          {
+            kind: "return",
+            expression: { kind: "identifier", name: "total" },
+          },
         ],
       },
     },
@@ -190,11 +198,7 @@ const completePatch = {
                     callee: "add",
                     arguments: [
                       { kind: "identifier", name: "base" },
-                      {
-                        kind: "call",
-                        callee: "sumHistory",
-                        arguments: [{ kind: "identifier", name: "input" }],
-                      },
+                      { kind: "call", callee: "sumHistory", arguments: [{ kind: "identifier", name: "input" }] },
                     ],
                   },
                 },
@@ -202,7 +206,10 @@ const completePatch = {
             },
             else: {
               statements: [
-                { kind: "return", expression: { kind: "identifier", name: "base" } },
+                {
+                  kind: "return",
+                  expression: { kind: "identifier", name: "base" },
+                },
               ],
             },
           },
@@ -277,34 +284,30 @@ const completePatch = {
   docComment: null,
 };
 
-describe("runAstCompletionLoop", () => {
-  it("converges across multiple partial patches", () => {
-    const result = runAstCompletionLoop([
-      serializeAstPatch({ moduleName: "AnalyticsOps" }),
-      serializeAstPatch({ functions: signaturePatch.functions }),
-      serializeAstPatch(completePatch),
-    ]);
+const sequence: string[] = [
+  serializeAstPatch({ moduleName: "AnalyticsOps" }),
+  serializeAstPatch({ functions: signaturePatch.functions }),
+  serializeAstPatch(completePatch),
+];
 
-    expect(result.terminal).toBe("success");
-    if (result.terminal === "success") {
-      expect(result.value.functions).toHaveLength(4);
-      expect(result.value.functions[1].body.statements[0].kind).toBe("let");
-      expect(result.value.functions[1].body.statements[2].kind).toBe("while");
-      expect(result.value.functions[3].body.statements[1].kind).toBe("return");
-    }
-  });
+const result = runAstCompletionLoop(sequence);
 
-  it("stops with retry_exhausted when the sequence never completes", () => {
-    const result = runAstCompletionLoop([
-      serializeAstPatch({ moduleName: "AnalyticsOps" }),
-      serializeAstPatch({ moduleName: "AnalyticsOpsRenamed" }),
-    ]);
-
-    expect(result.terminal).toBe("retry_exhausted");
-    if (result.terminal === "retry_exhausted") {
-      expect(result.candidate).toEqual({
-        moduleName: "AnalyticsOpsRenamed",
-      });
-    }
-  });
+result.attempts.forEach((attempt, index) => {
+  console.log(`Attempt ${index + 1}`);
+  console.log(`Raw: ${attempt.raw}`);
+  console.log(`Candidate: ${JSON.stringify(attempt.candidate)}`);
+  console.log(
+    `Feedback: ${typeof attempt.feedback === "string" ? attempt.feedback : JSON.stringify(attempt.feedback)}`,
+  );
+  console.log("---");
 });
+
+if (result.terminal === "success") {
+  console.log("Terminal: success");
+  console.log(formatTerminalCompletionLog(result));
+  console.log(JSON.stringify(result.value, null, 2));
+} else {
+  console.log("Terminal: retry_exhausted");
+  console.log(formatTerminalCompletionLog(result));
+  console.log(JSON.stringify(result.candidate, null, 2));
+}

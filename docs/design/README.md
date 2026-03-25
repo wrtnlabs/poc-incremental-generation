@@ -1,8 +1,8 @@
 # Design Breakdown Index
 
-This directory contains the implementation-facing breakdown derived from the higher-level plan in `.sisyphus/plans/deep-partial-iterative-completion.md`.
+This directory contains the implementation-facing breakdown for the current AST incremental completion PoC.
 
-The goal of these files is to lock the smallest useful decisions before scaffolding the TypeScript prototype.
+The goal of these files is to document the smallest useful decisions behind the current TypeScript prototype.
 
 ## Documents
 
@@ -17,4 +17,4 @@ The goal of these files is to lock the smallest useful decisions before scaffold
 
 The design is now detailed enough to begin implementation preparation.
 
-The next design step should identify the minimal scaffold and exact first test files to create.
+The documents are now reference material for the current implementation rather than a pending scaffold plan.

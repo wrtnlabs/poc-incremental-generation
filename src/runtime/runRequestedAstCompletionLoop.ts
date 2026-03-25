@@ -9,7 +9,6 @@ import {
   formatAttemptStartLog,
   formatPatchReceivedLog,
 } from "../runner/formatProgressLog";
-import { stageAstPatch, wasAstPatchStaged } from "./stageAstPatch";
 
 export interface PatchRequestContext {
   objective: string;
@@ -58,22 +57,8 @@ export const runRequestedAstCompletionLoop = async (
       attempt: context.attempt,
       patch,
     }));
-    const stagedPatch: AstPatch = stageAstPatch({
-      attempt: context.attempt,
-      patch,
-    });
-    if (
-      wasAstPatchStaged({
-        attempt: context.attempt,
-        original: patch,
-        staged: stagedPatch,
-      })
-    ) {
-      console.log(
-        `[Workflow] Attempt ${context.attempt} stage gate trimmed the patch before evaluation`,
-      );
-    }
-    rawPatches.push(JSON.stringify({ ast: stagedPatch }));
+
+    rawPatches.push(JSON.stringify({ ast: patch }));
 
     const result: LoopResult = runAstCompletionLoop(rawPatches, rawPatches.length);
     const latestAnalysis = result.attempts.at(-1)?.analysis;

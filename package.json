@@ -5,10 +5,10 @@
   "packageManager": "pnpm@10.12.1",
   "scripts": {
     "prepare": "ts-patch install",
-    "build": "tsc -p tsconfig.json",
+    "build": "rm -rf dist && tsc -p tsconfig.json",
     "test": "rm -rf .test-dist && tsc -p tsconfig.test.json --outDir .test-dist && jest --runInBand --config jest.dist.cjs",
     "runner": "pnpm build && node dist/runner/index.js",
-    "runner:micro": "pnpm build && node dist/runner/micro.js"
+    "runner:deterministic": "pnpm build && node dist/runner/deterministic.js"
   },
   "dependencies": {
     "@agentica/core": "0.44.1",

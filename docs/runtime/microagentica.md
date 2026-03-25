@@ -1,19 +1,14 @@
-# MicroAgentica Live Runner
+# MicroAgentica Runner
 
-This project now has a live runtime path that uses `MicroAgentica` with a real OpenAI-compatible API key.
+The canonical runner now uses `MicroAgentica`.
 
 ## Environment
 
-Copy `.env.example` to `.env` and fill in at least:
+Copy `.env.example` to `.env` and fill in:
 
 ```env
 OPENAI_API_KEY=sk-...
 OPENAI_MODEL=gpt-4o-mini
-```
-
-Optional:
-
-```env
 OPENAI_BASE_URL=
 MAX_ATTEMPTS=5
 ```
@@ -22,18 +17,39 @@ MAX_ATTEMPTS=5
 
 ```bash
 pnpm install
-pnpm runner:micro
+pnpm runner
 ```
 
-## Behavior
+## Optional deterministic comparison
 
-- `MicroAgentica` is asked to call a single `submit` tool.
-- The tool accepts `DeepPartial<ImaginaryModuleAst>` patches.
-- Each submitted patch is serialized to the existing `{"ast": ...}` format.
-- The existing merge and strict completion logic remains the source of truth.
+```bash
+pnpm runner:deterministic
+```
 
-## Important Caveat
+## Workflow
 
-This is still a PoC.
+- each attempt may submit any partial AST patch
+- the patch is merged as-is into the current candidate
+- strict AST validation decides whether more attempts are needed
 
-The live runner proves that a real LLM can participate in the loop, but the authoritative completion decision still comes from the local strict validation path.
+## Current Canonical Example
+
+The current example target is an `AnalyticsOps` module with:
+
+- `add(left, right)`
+- `computeBaseScore(input)`
+- `applyBonus(input, score)`
+- `clampScore(score)`
+- `computeFinalScore(input)`
+
+The example now uses:
+
+- multiple helper functions with cross-function calls
+- multiple assignment statements
+- assignment statements
+- if statements
+- nested if statements
+- property access expressions
+- comparison operators in binary expressions
+
+The final acceptance check still comes from the local strict AST validator.

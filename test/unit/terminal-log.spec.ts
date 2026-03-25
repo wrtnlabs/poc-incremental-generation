@@ -13,7 +13,7 @@ describe("formatTerminalCompletionLog", () => {
           docComment: null,
         },
       }),
-    ).toContain("CompletionStatus: strict T satisfied");
+    ).toContain("CompletionStatus: strict AST satisfied");
   });
 
   it("reports why strict completion was not satisfied", () => {

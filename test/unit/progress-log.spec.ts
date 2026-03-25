@@ -40,7 +40,7 @@ describe("formatProgressLog", () => {
         incomplete: 1,
         invalid: 0,
       }),
-    ).toContain("pending strict T");
+    ).toContain("pending strict AST");
   });
 
   it("formats MicroAgentica request and response logs", () => {

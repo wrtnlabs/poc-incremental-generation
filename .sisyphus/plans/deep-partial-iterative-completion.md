@@ -52,12 +52,6 @@ The prototype must anchor its ingress and validation APIs to concrete packages b
     - `typia.validate<T>()`
     - `typia.llm.application<App>()`
     - `typia.llm.parameters<T>()`
-- `@agentica/core`
-  - source: `https://github.com/wrtnlabs/agentica`
-  - purpose: loop-facing orchestration and tool-calling integration
-- optional runtime vendor package
-  - exact package depends on the first runnable harness
-  - likely examples include `openai`, but vendor wiring is not required for the earliest deterministic tests
 
 ### API Origin Clarification
 
@@ -69,11 +63,11 @@ For this experiment, its origin is:
 2. select a generated function from `application.functions`
 3. use that function's `parse()` method as the ingress normalizer
 
-This means Unit 5 depends directly on `typia` first, and only indirectly on `@agentica/core` when the orchestration loop is wired.
+This means Unit 5 depends directly on `typia` for generated parsing and validation behavior.
 
 ### Versioning Rule
 
-At scaffold time, the package manifest must pin concrete versions for `typia` and `@agentica/core` rather than using floating ranges. The exact pinned versions should be recorded in `package.json` and repeated in implementation notes so the prototype is reproducible.
+At scaffold time, the package manifest must pin a concrete `typia` version rather than using a floating range. The exact pinned version should be recorded in `package.json` and repeated in implementation notes so the prototype is reproducible.
 
 ## Success Criteria
 

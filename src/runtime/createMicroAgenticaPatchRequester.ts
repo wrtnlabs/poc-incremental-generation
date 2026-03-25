@@ -8,7 +8,6 @@ import {
   formatMicroAgenticaResponseLog,
 } from "../runner/formatProgressLog";
 import type { MicroAgenticaRuntimeConfig } from "./readMicroAgenticaRuntimeConfig";
-import { describeAstStageRule } from "./stageAstPatch";
 import type { RequestPatch } from "./runRequestedAstCompletionLoop";
 
 class AstPatchSubmissionController {
@@ -69,14 +68,11 @@ ${JSON.stringify(props.candidate, null, 2)}
 Latest feedback:
 ${JSON.stringify(props.latestFeedback, null, 2)}
 
-Stage rule for this attempt:
-${describeAstStageRule(props.attempt)}
-
 Required missing paths to address now:
 ${requiredMissingPaths.length === 0 ? "none" : requiredMissingPaths.join(", ")}
 
-If the remaining missing paths are top-level keys such as exports or docComment, this patch MUST include those top-level keys.
-If you are not correcting function internals on this attempt, do not resend unchanged functions.
+If the remaining missing paths are top-level keys such as exports or docComment, prioritize including those top-level keys.
+Return the smallest patch that moves the current candidate closer to a strict AST.
 `;
 };
 
@@ -112,12 +108,14 @@ export const createMicroAgenticaPatchRequester = (
 
   return async (context) => {
     latestPatch = undefined;
-    console.log(formatMicroAgenticaRequestLog({
-      attempt: context.attempt,
-      maxAttempts: context.maxAttempts,
-      model: config.model,
-      hasCustomBaseUrl: config.baseURL !== undefined,
-    }));
+    console.log(
+      formatMicroAgenticaRequestLog({
+        attempt: context.attempt,
+        maxAttempts: context.maxAttempts,
+        model: config.model,
+        hasCustomBaseUrl: config.baseURL !== undefined,
+      }),
+    );
     await agent.conversate(
       buildPrompt({
         objective: context.objective,
@@ -130,10 +128,12 @@ export const createMicroAgenticaPatchRequester = (
     if (latestPatch === undefined) {
       throw new Error("MicroAgentica did not submit a patch.");
     }
-    console.log(formatMicroAgenticaResponseLog({
-      attempt: context.attempt,
-      patch: latestPatch,
-    }));
+    console.log(
+      formatMicroAgenticaResponseLog({
+        attempt: context.attempt,
+        patch: latestPatch,
+      }),
+    );
     return latestPatch;
   };
 };

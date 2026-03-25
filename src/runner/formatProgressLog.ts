@@ -30,8 +30,8 @@ export const formatAttemptResultLog = (props: {
   invalid: number;
 }): string =>
   props.terminal
-    ? `[Workflow] Attempt ${props.attempt} satisfied strict T`
-    : `[Workflow] Attempt ${props.attempt} pending strict T (missing=${props.missing}, incomplete=${props.incomplete}, invalid=${props.invalid})`;
+    ? `[Workflow] Attempt ${props.attempt} satisfied strict AST`
+    : `[Workflow] Attempt ${props.attempt} pending strict AST (missing=${props.missing}, incomplete=${props.incomplete}, invalid=${props.invalid})`;
 
 export const formatMicroAgenticaRequestLog = (props: {
   attempt: number;

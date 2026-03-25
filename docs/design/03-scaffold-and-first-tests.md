@@ -1,72 +1,45 @@
-# Implementation Prep — Scaffold and First Tests
+# Implementation Prep — Current Project Shape
 
 ## Purpose
 
-This document marks the point where the design becomes implementation-ready.
+The project is now an AST incremental completion PoC with a canonical MicroAgentica runner and a deterministic comparison runner.
 
-The decisions here are intentionally narrow:
+The canonical execution path is the MicroAgentica runner plus the unit and integration tests.
+
+## Current Tooling
 
 - package manager: `pnpm`
-- compiler path: `tsc` with `typia` transform via `ts-patch`
-- test runner: `jest` with `ts-jest`
-- manual runner path: build first, then execute compiled JavaScript with `node`
+- compiler: `tsc` with `typia` transform via `ts-patch`
+- test runner: `jest`
 
-## Pinned Packages
+## Core Files
 
-- `typia@12.0.1`
-- `@typia/interface@12.0.1`
-- `@agentica/core@0.44.1`
-- `@samchon/openapi@6.0.1`
-- `typescript@5.9.3`
-- `ts-patch@3.3.0`
-- `jest@30.3.0`
-- `@types/jest@30.0.0`
-- `@types/node@25.5.0`
-
-## First Files To Create
-
-- `package.json`
-- `tsconfig.json`
-- `tsconfig.test.json`
-- `jest.dist.cjs`
-- `src/domain/order.ts`
+- `src/domain/ast.ts`
 - `src/domain/patch.ts`
-- `src/accumulation/mergeOrderPatch.ts`
-- `src/completeness/analyzeOrderCompletion.ts`
+- `src/ingress/parseAstPatch.ts`
+- `src/accumulation/mergeAstPatch.ts`
+- `src/completeness/analyzeAstCompletion.ts`
 - `src/feedback/normalizeCompletionFeedback.ts`
-- `src/ingress/parseOrderPatch.ts`
-- `src/loop/runOrderDraftLoop.ts`
+- `src/loop/runAstCompletionLoop.ts`
 - `src/runner/index.ts`
-- `test/unit/*.spec.ts`
-- `test/integration/loop.spec.ts`
+- `src/runner/deterministic.ts`
+- `src/runner/formatTerminalCompletionLog.ts`
 
-## First Commands
-
-Install and patch TypeScript:
+## Verification Commands
 
 ```bash
-pnpm install
-pnpm prepare
-```
-
-Run tests:
-
-```bash
-pnpm test -- --runInBand
-```
-
-Run the manual runner:
-
-```bash
+pnpm test
 pnpm build
-node dist/runner/index.js
+pnpm runner
+pnpm runner:deterministic
 ```
 
-## Implementation Gate
+## Result
 
-Implementation may begin immediately after this document because:
+The project demonstrates:
 
-- the target schema is fixed
-- completeness and feedback semantics are fixed
-- the toolchain and dependency path are fixed
-- the first file list is fixed
+- incremental `DeepPartial<T>` patch submission
+- deterministic merge behavior
+- strict final acceptance against `ImaginaryModuleAst`
+- clear terminal logging for complete vs incomplete outcomes
+- canonical live runner behavior plus deterministic comparison behavior

@@ -3,9 +3,9 @@ import type { LoopResult } from "../loop/runAstCompletionLoop";
 const summarizeTerminalStatus = (result: LoopResult): string[] => {
   if (result.terminal === "success") {
     return [
-      "CompletionStatus: strict T satisfied",
+      "CompletionStatus: strict AST satisfied",
       `CompletionState: complete after ${result.attempts.length} attempt(s)`,
-      "CompletionReason: all required AST nodes are present and strict validation passed",
+      "CompletionReason: all required AST nodes are present and strict AST validation passed",
     ];
   }
 
@@ -14,7 +14,7 @@ const summarizeTerminalStatus = (result: LoopResult): string[] => {
     .find((attempt) => attempt.analysis !== null)?.analysis;
 
   return [
-    "CompletionStatus: strict T not satisfied",
+    "CompletionStatus: strict AST not satisfied",
     `CompletionState: incomplete after ${result.attempts.length} attempt(s)`,
     `CompletionReason: missing=${latestAnalysis?.missing.length ?? 0}, incomplete=${latestAnalysis?.incomplete.length ?? 0}, invalid=${latestAnalysis?.invalid.length ?? 0}`,
   ];
