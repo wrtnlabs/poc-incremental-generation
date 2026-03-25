@@ -294,7 +294,11 @@ describe("runRequestedAstCompletionLoop", () => {
     if (result.terminal === "success") {
       expect(result.value.functions[1].body.statements[0].kind).toBe("let");
       expect(result.value.functions[1].body.statements[2].kind).toBe("while");
-      expect(result.value.functions[3].body.statements[1].expression.kind).toBe("objectLiteral");
+      const reportReturn = result.value.functions[3].body.statements[1];
+      expect(reportReturn.kind).toBe("return");
+      if (reportReturn.kind === "return") {
+        expect(reportReturn.expression.kind).toBe("objectLiteral");
+      }
     }
   });
 

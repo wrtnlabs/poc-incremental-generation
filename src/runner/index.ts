@@ -7,48 +7,35 @@ import { runRequestedAstCompletionLoop } from "../runtime/runRequestedAstComplet
 
 const OBJECTIVE = `Create an AST for a fictional language module named AnalyticsOps.
 
-- exports: ["add", "sumHistory", "computeScore", "buildReport"]
-- docComment: null
+Required exports: add, sumHistory, computeScore, buildReport.
+docComment must be null.
 
-- one function named add
-  - parameters: left: Int, right: Int
-  - returnType: Int
-  - function body: return left + right
+Function add:
+- returns left plus right
 
-- one function named sumHistory
-  - parameters: input: Input
-  - returnType: Int
-  - body requirements:
-    - first create a let binding "total = 0"
-    - then create a let binding "current = input.history.first"
-    - then use a while statement with condition "current < input.history.limit"
-    - inside the while body:
-      - assign "total = add(total, current)"
-      - assign "current = add(current, input.history.step)"
-    - return total
+Function sumHistory:
+- input is Input
+- total starts at zero
+- current starts at input history first
+- while current is less than input history limit
+- update total with add of total and current
+- update current with add of current and input history step
+- return total
 
-- one function named computeScore
-  - parameters: input: Input
-  - returnType: Int
-  - body requirements:
-    - create a let binding "base = add(input.metrics.primary, input.metrics.secondary)"
-    - then use an if statement
-    - condition: "input.flags.vip > 0"
-    - then branch: return add(base, sumHistory(input))
-    - else branch: return base
+Function computeScore:
+- input is Input
+- base is add of input metrics primary and input metrics secondary
+- if input flags vip is greater than zero, return add of base and sumHistory input
+- otherwise return base
 
-- one function named buildReport
-  - parameters: input: Input
-  - returnType: Report
-  - body requirements:
-    - create a let binding "score = computeScore(input)"
-    - return an object literal with exactly these properties:
-      - "score: score"
-      - "history: [input.history.first, input.history.step, score]"
-      - "passed: score >= 50"
+Function buildReport:
+- input is Input
+- score is computeScore input
+- return an object literal with properties score, history, and passed
+- history is an array literal with input history first, input history step, and score
+- passed is score greater than or equal to fifty
 
-- generate AST nodes only, never source code text as the final artifact
-- prefer the smallest correct patch for each attempt, but keep cross-function consistency
+Use AST nodes only. No source code text. Keep patches small but consistent.
 `;
 
 const main = async (): Promise<void> => {

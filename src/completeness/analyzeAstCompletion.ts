@@ -141,6 +141,81 @@ const dedupeByPath = <T extends { path: string }>(items: readonly T[]): T[] =>
       array.findIndex((candidate) => candidate.path === item.path) === index,
   );
 
+const analyzeSemanticInvalidIssues = (
+  candidate: unknown,
+): InvalidCompletionIssue[] => {
+  if (isRecord(candidate) === false) {
+    return [];
+  }
+
+  const functions: unknown = candidate.functions;
+  const exportsValue: unknown = candidate.exports;
+  if (Array.isArray(functions) === false || Array.isArray(exportsValue) === false) {
+    return [];
+  }
+
+  const functionNames: string[] = functions.flatMap((functionNode) =>
+    isRecord(functionNode) && typeof functionNode.name === "string"
+      ? [functionNode.name]
+      : [],
+  );
+
+  const exportedNameIssues: InvalidCompletionIssue[] = exportsValue.flatMap(
+    (exportedName, index) => {
+      if (typeof exportedName !== "string") {
+        return [];
+      }
+      return functionNames.includes(exportedName)
+        ? []
+        : [
+            {
+              kind: "invalid" as const,
+              path: `exports[${index}]`,
+              expected: "a function name defined in functions[]",
+              actual: exportedName,
+            },
+          ];
+    },
+  );
+
+  const duplicateExportIssues: InvalidCompletionIssue[] = exportsValue.flatMap(
+    (exportedName, index) =>
+      typeof exportedName === "string" &&
+      exportsValue.findIndex((candidateName) => candidateName === exportedName) !== index
+        ? [
+            {
+              kind: "invalid" as const,
+              path: `exports[${index}]`,
+              expected: "a unique export name",
+              actual: exportedName,
+            },
+          ]
+        : [],
+  );
+
+  const duplicateFunctionIssues: InvalidCompletionIssue[] = functions.flatMap(
+    (functionNode, index) =>
+      isRecord(functionNode) &&
+      typeof functionNode.name === "string" &&
+      functionNames.findIndex((name) => name === functionNode.name) !== index
+        ? [
+            {
+              kind: "invalid" as const,
+              path: `functions[${index}].name`,
+              expected: "a unique function name",
+              actual: functionNode.name,
+            },
+          ]
+        : [],
+  );
+
+  return [
+    ...exportedNameIssues,
+    ...duplicateExportIssues,
+    ...duplicateFunctionIssues,
+  ];
+};
+
 export const analyzeAstCompletion = (
   candidate: unknown,
 ): CompletionAnalysis => {
@@ -226,19 +301,22 @@ export const analyzeAstCompletion = (
 
   const invalid: InvalidCompletionIssue[] = sortByPath(
     dedupeByPath(
-      (validation.success === false
-        ? validation.errors
-            .filter(
-              (error): error is typeof error & { value: unknown } =>
-                error.value !== undefined,
-            )
-            .map((error) => ({
-              kind: "invalid" as const,
-              path: toPath(error.path),
-              expected: error.expected,
-              actual: error.value,
-            }))
-        : []),
+      [
+        ...(validation.success === false
+          ? validation.errors
+              .filter(
+                (error): error is typeof error & { value: unknown } =>
+                  error.value !== undefined,
+              )
+              .map((error) => ({
+                kind: "invalid" as const,
+                path: toPath(error.path),
+                expected: error.expected,
+                actual: error.value,
+              }))
+          : []),
+        ...analyzeSemanticInvalidIssues(candidate),
+      ],
     ),
   );
 

@@ -79,61 +79,89 @@ Return the smallest patch that moves the current candidate closer to a strict AS
 export const createMicroAgenticaPatchRequester = (
   config: MicroAgenticaRuntimeConfig,
 ): RequestPatch => {
-  let latestPatch: AstPatch | undefined;
-  const controller = new AstPatchSubmissionController((ast) => {
-    latestPatch = ast;
-  });
-
-  const agent = new MicroAgentica({
-    vendor: {
-      api: new OpenAI({
-        apiKey: config.apiKey,
-        baseURL: config.baseURL,
-      }),
-      model: config.model,
-    },
-    controllers: [
-      typia.llm.controller<AstPatchSubmissionController>(
-        "astPatch",
-        controller,
-      ),
-    ],
-    config: {
-      executor: {
-        describe: false,
+  const createAgent = (submitter: (ast: AstPatch) => void): MicroAgentica => {
+    const controller = new AstPatchSubmissionController(submitter);
+    return new MicroAgentica({
+      vendor: {
+        api: new OpenAI({
+          apiKey: config.apiKey,
+          baseURL: config.baseURL,
+        }),
+        model: config.model,
       },
-      locale: "en-US",
-    },
-  });
+      controllers: [
+        typia.llm.controller<AstPatchSubmissionController>(
+          "astPatch",
+          controller,
+        ),
+      ],
+      config: {
+        executor: {
+          describe: false,
+        },
+        locale: "en-US",
+      },
+    });
+  };
+
+  const isRetryableProviderError = (error: unknown): boolean => {
+    const message =
+      error instanceof Error ? error.message : typeof error === "string" ? error : "";
+    return (
+      message.includes("Provider returned error") ||
+      message.includes("provider_unavailable") ||
+      message.includes("Expecting ',' delimiter") ||
+      message.includes("System message must be at the beginning") ||
+      message.includes("Upstream error")
+    );
+  };
 
   return async (context) => {
-    latestPatch = undefined;
-    console.log(
-      formatMicroAgenticaRequestLog({
-        attempt: context.attempt,
-        maxAttempts: context.maxAttempts,
-        model: config.model,
-        hasCustomBaseUrl: config.baseURL !== undefined,
-      }),
-    );
-    await agent.conversate(
-      buildPrompt({
-        objective: context.objective,
-        attempt: context.attempt,
-        maxAttempts: context.maxAttempts,
-        candidate: context.candidate,
-        latestFeedback: context.latestFeedback,
-      }),
-    );
-    if (latestPatch === undefined) {
-      throw new Error("MicroAgentica did not submit a patch.");
+    let lastError: unknown;
+    for (let retry = 0; retry < 3; ++retry) {
+      let latestPatch: AstPatch | undefined;
+      const agent = createAgent((ast) => {
+        latestPatch = ast;
+      });
+      console.log(
+        formatMicroAgenticaRequestLog({
+          attempt: context.attempt,
+          maxAttempts: context.maxAttempts,
+          model: config.model,
+          hasCustomBaseUrl: config.baseURL !== undefined,
+        }),
+      );
+      try {
+        await agent.conversate(
+          buildPrompt({
+            objective: context.objective,
+            attempt: context.attempt,
+            maxAttempts: context.maxAttempts,
+            candidate: context.candidate,
+            latestFeedback: context.latestFeedback,
+          }),
+        );
+        if (latestPatch === undefined) {
+          throw new Error("MicroAgentica did not submit a patch.");
+        }
+        console.log(
+          formatMicroAgenticaResponseLog({
+            attempt: context.attempt,
+            patch: latestPatch,
+          }),
+        );
+        return latestPatch;
+      } catch (error: unknown) {
+        lastError = error;
+        if (retry < 2 && isRetryableProviderError(error)) {
+          console.log(
+            `[MicroAgentica] Retrying attempt ${context.attempt} after provider error (${retry + 1}/2)`,
+          );
+          continue;
+        }
+        throw error;
+      }
     }
-    console.log(
-      formatMicroAgenticaResponseLog({
-        attempt: context.attempt,
-        patch: latestPatch,
-      }),
-    );
-    return latestPatch;
+    throw lastError;
   };
 };
